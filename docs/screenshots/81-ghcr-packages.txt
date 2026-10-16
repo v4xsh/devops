@@ -1,0 +1,6 @@
+$ gh api '/users/v4xsh/packages?package_type=container' -q '.[] | [.name, .visibility, .repository.full_name, .html_url, .updated_at] | @tsv' | column -t -s $'\t' -N NAME,VISIBILITY,REPOSITORY,URL,UPDATED
+NAME                VISIBILITY  REPOSITORY             URL                                                                           UPDATED
+taskboard-backend   public      v4xsh/devops-homework  https://github.com/users/v4xsh/packages/container/package/taskboard-backend   2026-10-07T20:23:12Z
+taskboard-frontend  public      v4xsh/devops-homework  https://github.com/users/v4xsh/packages/container/package/taskboard-frontend  2026-10-07T20:23:21Z
+deskflow-backend    public      v4xsh/devops           https://github.com/users/v4xsh/packages/container/package/deskflow-backend    2026-10-16T07:32:44Z
+deskflow-frontend   public      v4xsh/devops           https://github.com/users/v4xsh/packages/container/package/deskflow-frontend   2026-10-16T07:32:52Z

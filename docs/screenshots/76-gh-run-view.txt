@@ -1,0 +1,16 @@
+$ gh run view 38867697717 -R v4xsh/devops
+
+✓ main CI/CD · 38867697717
+Triggered via push about 38 minutes ago
+
+JOBS
+✓ Test (pytest + frontend build) in 25s (ID 116864221524)
+✓ Build, scan & push images in 1m40s (ID 116864373171)
+- Deploy with Helm (ID 116864954248)
+
+ARTIFACTS
+v4xsh~devops~FN5G71.dockerbuild
+v4xsh~devops~HANGST.dockerbuild
+
+For more information about a job, try: gh run view --job=<job-id>
+View this run on GitHub: https://github.com/v4xsh/devops/actions/runs/38867697717

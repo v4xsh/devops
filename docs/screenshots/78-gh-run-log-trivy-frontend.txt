@@ -1,0 +1,36 @@
+$ gh run view 38867697717 -R v4xsh/devops --log   # frontend image: Trivy report, SARIF upload and gate steps
+
+=== step: Trivy report (frontend, SARIF) ===
+$ trivy image --severity HIGH,CRITICAL --exit-code 0 --format sarif -o trivy-frontend.sarif "$FRONTEND_IMAGE:bd9cb0bdd9c0583e9964766c77ff3b13861e970e"
+INFO  [vuln] Vulnerability scanning is enabled
+INFO  Detected OS  family="alpine" version="3.21.3"
+INFO  [alpine] Detecting vulnerabilities...  os_version="3.21" repository="3.21" pkg_num=68
+INFO  Number of language-specific files  num=0
+
+=== step: Upload frontend SARIF to Security tab ===
+uses: github/codeql-action/upload-sarif@v4
+Existing job run UUID is 8f659deb-5596-455c-861b-dad56fdf1ab9.
+Post-processing sarif files: ["trivy-frontend.sarif"]
+Validating trivy-frontend.sarif
+Uploading code scanning results
+Uploading results
+Successfully uploaded results
+Waiting for processing to finish
+Analysis upload status is complete.
+
+=== step: Trivy gate (frontend, fixable HIGH/CRITICAL) ===
+$ trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 "$FRONTEND_IMAGE:bd9cb0bdd9c0583e9964766c77ff3b13861e970e"
+INFO  [vuln] Vulnerability scanning is enabled
+INFO  Detected OS  family="alpine" version="3.21.3"
+INFO  [alpine] Detecting vulnerabilities...  os_version="3.21" repository="3.21" pkg_num=68
+INFO  Number of language-specific files  num=0
+Report Summary
+┌──────────────────────────────────────────────────────────────────────────────────┬────────┬─────────────────┬─────────┐
+│                                      Target                                      │  Type  │ Vulnerabilities │ Secrets │
+├──────────────────────────────────────────────────────────────────────────────────┼────────┼─────────────────┼─────────┤
+│ ghcr.io/v4xsh/deskflow-frontend:bd9cb0bdd9c0583e9964766c77ff3b13861e970e (alpine │ alpine │        0        │    -    │
+│ 3.21.3)                                                                          │        │                 │         │
+└──────────────────────────────────────────────────────────────────────────────────┴────────┴─────────────────┴─────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)

@@ -1,0 +1,7 @@
+$ gh run list -R v4xsh/devops -L 10
+completed	success	add github evidence and screenshot index	CI/CD	main	push	38867697717	2m12s	2026-10-16T07:30:53Z
+completed	success	update workflow actions to node 24 releases and pin runner image	CI/CD	main	push	38867226880	2m1s	2026-10-16T07:26:30Z
+completed	success	write project report, design decisions and demo script	CI/CD	main	push	38866645112	2m13s	2026-10-16T07:21:01Z
+completed	success	add kind bootstrap script for the full local stack	CI/CD	main	push	38864542000	2m36s	2026-10-16T07:00:56Z
+completed	success	add helm chart with hpa, ingress and postgres statefulset	CI/CD	main	push	38863580850	2m13s	2026-10-16T06:51:18Z
+completed	success	add ci/cd pipeline with tests, trivy scan and ghcr push	CI/CD	main	push	38863090514	3m8s	2026-10-16T06:46:12Z

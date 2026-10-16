@@ -1,0 +1,5 @@
+$ gh api repos/v4xsh/devops/code-scanning/alerts --paginate -q '.[] | "\(.rule.security_severity_level)\t\(.state)\t\(.most_recent_instance.category)"' | sort | uniq -c | awk 'BEGIN{print "COUNT  SEVERITY  STATE  CATEGORY"} {print}'; echo; echo -n 'total alerts: '; gh api repos/v4xsh/devops/code-scanning/alerts --paginate -q '.[].number' | wc -l
+COUNT  SEVERITY  STATE  CATEGORY
+     44 high	open	trivy-backend
+
+total alerts: 44

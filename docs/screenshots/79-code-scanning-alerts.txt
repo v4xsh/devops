@@ -1,0 +1,31 @@
+$ gh api repos/v4xsh/devops/code-scanning/alerts --paginate -q '.[] | [.number, .state, .rule.security_severity_level, .rule.id, .tool.name, .most_recent_instance.category, .rule.description[0:60]] | @tsv' | column -t -s $'\t' | head -30
+44  open  high  CVE-2026-78410  Trivy  trivy-backend  util-linux: util-linux: restricted bind mounts do not pin th
+43  open  high  CVE-2026-78409  Trivy  trivy-backend  util-linux: util-linux: X-mount.subdir detached-tree resolut
+42  open  high  CVE-2026-78408  Trivy  trivy-backend  util-linux: util-linux: nsenter --join-cgroup leaks root cgr
+41  open  high  CVE-2026-76642  Trivy  trivy-backend  util-linux: util-linux: failed external mount helper still r
+40  open  high  CVE-2026-9538   Trivy  trivy-backend  perl-Archive-Tar: perl-Archive-Tar: Denial of Service via cr
+39  open  high  CVE-2025-69720  Trivy  trivy-backend  ncurses: ncurses: Buffer overflow vulnerability may lead to 
+38  open  high  CVE-2025-69720  Trivy  trivy-backend  ncurses: ncurses: Buffer overflow vulnerability may lead to 
+37  open  high  CVE-2026-78410  Trivy  trivy-backend  util-linux: util-linux: restricted bind mounts do not pin th
+36  open  high  CVE-2026-78409  Trivy  trivy-backend  util-linux: util-linux: X-mount.subdir detached-tree resolut
+35  open  high  CVE-2026-78408  Trivy  trivy-backend  util-linux: util-linux: nsenter --join-cgroup leaks root cgr
+34  open  high  CVE-2026-76642  Trivy  trivy-backend  util-linux: util-linux: failed external mount helper still r
+33  open  high  CVE-2026-78410  Trivy  trivy-backend  util-linux: util-linux: restricted bind mounts do not pin th
+32  open  high  CVE-2026-78409  Trivy  trivy-backend  util-linux: util-linux: X-mount.subdir detached-tree resolut
+31  open  high  CVE-2026-78408  Trivy  trivy-backend  util-linux: util-linux: nsenter --join-cgroup leaks root cgr
+30  open  high  CVE-2026-76642  Trivy  trivy-backend  util-linux: util-linux: failed external mount helper still r
+29  open  high  CVE-2026-78410  Trivy  trivy-backend  util-linux: util-linux: restricted bind mounts do not pin th
+28  open  high  CVE-2026-78409  Trivy  trivy-backend  util-linux: util-linux: X-mount.subdir detached-tree resolut
+27  open  high  CVE-2026-78408  Trivy  trivy-backend  util-linux: util-linux: nsenter --join-cgroup leaks root cgr
+26  open  high  CVE-2026-76642  Trivy  trivy-backend  util-linux: util-linux: failed external mount helper still r
+25  open  high  CVE-2026-16742  Trivy  trivy-backend  systemd: systemd-homed: Local privilege escalation via missi
+24  open  high  CVE-2025-69720  Trivy  trivy-backend  ncurses: ncurses: Buffer overflow vulnerability may lead to 
+23  open  high  CVE-2026-16742  Trivy  trivy-backend  systemd: systemd-homed: Local privilege escalation via missi
+22  open  high  CVE-2026-78410  Trivy  trivy-backend  util-linux: util-linux: restricted bind mounts do not pin th
+21  open  high  CVE-2026-78409  Trivy  trivy-backend  util-linux: util-linux: X-mount.subdir detached-tree resolut
+20  open  high  CVE-2026-78408  Trivy  trivy-backend  util-linux: util-linux: nsenter --join-cgroup leaks root cgr
+19  open  high  CVE-2026-76642  Trivy  trivy-backend  util-linux: util-linux: failed external mount helper still r
+18  open  high  CVE-2025-69720  Trivy  trivy-backend  ncurses: ncurses: Buffer overflow vulnerability may lead to 
+17  open  high  CVE-2026-78410  Trivy  trivy-backend  util-linux: util-linux: restricted bind mounts do not pin th
+16  open  high  CVE-2026-78409  Trivy  trivy-backend  util-linux: util-linux: X-mount.subdir detached-tree resolut
+15  open  high  CVE-2026-78408  Trivy  trivy-backend  util-linux: util-linux: nsenter --join-cgroup leaks root cgr

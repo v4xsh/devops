@@ -1,0 +1,8 @@
+$ gh api '/users/v4xsh/packages/container/deskflow-backend/versions' -q '.[] | [.id, (.metadata.container.tags | join(",")), .created_at] | @tsv' | column -t -s $'\t' -N VERSION_ID,TAGS,CREATED
+VERSION_ID  TAGS                                             CREATED
+1395691350  bd9cb0bdd9c0583e9964766c77ff3b13861e970e,latest  2026-10-16T07:32:44Z
+1395672995  d078203afd23ad64c4a2d5a418cc3fc1c82545eb         2026-10-16T07:28:13Z
+1395652420  e06700f800d426b7689cea84f73025ce917ecdb2         2026-10-16T07:22:51Z
+1395578710  7c37fcf62b54b783371b8d27336f6f6fe6db94be         2026-10-16T07:03:08Z
+1395540692  ac35a87c5bb6b93516b93e7728c9c25a0fb59dcd         2026-10-16T06:53:09Z
+1395525684  d7520cb8e0e8f8323c7c64e713e0e29256bd3287         2026-10-16T06:48:56Z
