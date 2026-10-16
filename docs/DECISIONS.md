@@ -39,6 +39,9 @@ A record of the choices made while building DeskFlow and why. Newest-relevant fi
 | Tags: full commit SHA **and** `latest` | SHA for traceability and deployment; `latest` only for convenience. |
 | Deploy job gated by a `deploy_enabled` output computed from the `KUBECONFIG_B64` secret | Job-level `if:` cannot read secrets directly. With no secret configured the job shows as *skipped*, not failed. |
 | `bandit -r app -ll` added to the test job | Covers the SAST layer that Trivy does not. |
+| Actions pinned to their current majors (checkout v7, setup-python v7, setup-node v7, docker/* v4/v7, codeql-action v4, …) | Older majors run on the deprecated Node 20 Actions runtime and CodeQL Action v3 is deprecated in December 2026; the first runs showed these as warnings. |
+| `runs-on: ubuntu-24.04` instead of `ubuntu-latest` | `ubuntu-latest` moves to Ubuntu 26 on 19 Oct 2026; pinning keeps builds reproducible until I choose to move. |
+| Frontend builds with Node 20 (CI and the Dockerfile build stage) | Matches the course specification. Node is only used at build time and is not in the shipped image; moving to Node 22/24 is a one-line change. |
 | `concurrency` with `cancel-in-progress` | A newer push supersedes an older run on the same branch. |
 
 ## Infrastructure (Terraform)
