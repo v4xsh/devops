@@ -5,11 +5,6 @@ const NAV = [
   { id: 'agents', label: 'Agents', icon: 'users' },
 ]
 
-const SOON = [
-  { label: 'Reports', icon: 'chart' },
-  { label: 'Settings', icon: 'settings' },
-]
-
 export default function Sidebar({ view, onNavigate, stats }) {
   const openCount = stats ? stats.by_status.open + stats.by_status.in_progress : null
   return (
@@ -32,13 +27,6 @@ export default function Sidebar({ view, onNavigate, stats }) {
           <Icon name={item.icon} />
           <span>{item.label}</span>
           {item.id === 'dashboard' && openCount !== null && <span className="nav-count">{openCount}</span>}
-        </button>
-      ))}
-      {SOON.map((item) => (
-        <button key={item.label} className="nav-item disabled" disabled title="Coming soon">
-          <Icon name={item.icon} />
-          <span>{item.label}</span>
-          <span className="nav-soon">soon</span>
         </button>
       ))}
 
