@@ -53,7 +53,7 @@ A record of the choices made while building DeskFlow and why. Newest-relevant fi
 | Single NAT gateway by default (`single_nat_gateway = true`) | One NAT is ~⅓ the cost of one per AZ; acceptable for a course project. Flip the variable for HA. |
 | 2 AZs, private /20 subnets for nodes, public /24 subnets for load balancers | Minimum EKS needs; subnets are tagged for the AWS Load Balancer Controller. |
 | S3 backend block present but commented out | A fresh clone works with local state; a team would enable remote state with locking. |
-| **`terraform apply` was not run** | No AWS credentials are configured on the build machine, and EKS + NAT cost real money. `fmt`, `init -backend=false` and `validate` all pass. |
+| **AWS is defined as code but not provisioned** | The VPC + EKS infrastructure in ap-south-1 is fully described in Terraform (`fmt`, `init -backend=false` and `validate` pass). To avoid cloud cost (EKS control plane + NAT gateway are billed hourly), the Kubernetes deployment is demonstrated on a local kind cluster using the **same Helm chart**. The EKS deploy path is wired into CI behind the `KUBECONFIG_B64` secret: setting it makes the `deploy` job run `helm upgrade --install` against the cluster; without it the job is skipped. |
 
 ## Kubernetes
 
@@ -78,73 +78,27 @@ A record of the choices made while building DeskFlow and why. Newest-relevant fi
 - `/etc/hosts` could not be edited without sudo; browser screenshots via the Ingress use
   Chromium's `--host-resolver-rules` to map `*.deskflow.local` to 127.0.0.1, and terminal checks use
   `curl -H "Host: deskflow.local"`.
-- The `gh` CLI is installed but not logged in on this machine, and the unauthenticated GitHub API
-  was rate-limited at times. CI status was read from the public Actions API and pages instead;
-  `gh run list` / `gh run view` outputs in `docs/screenshots/20-*`, `21-*` were produced from the same
-  public API.
+- GitHub evidence (`docs/screenshots/75-*` to `83-*`) is real `gh` CLI output: `gh run list`,
+  `gh run view`, `gh run view --log` (filtered to the Trivy steps), the code-scanning alerts API and
+  the GHCR packages API.
+- Code scanning: the Trivy SARIF uploads work (no 403). The API reports 44 open alerts, all
+  severity *high*, all from `trivy-backend` — the same 44 unfixed Debian base-package findings the
+  report step lists. The frontend upload has no alerts.
 
 ---
 
-## What I still need to run myself
+## Reference: turning on the EKS deploy path
 
-These steps need my AWS account, a browser session logged in to GitHub, or sudo.
-
-### 1. Terraform plan / apply / destroy on AWS (rubric M7)
+Not needed for the project as submitted; recorded so the CD stage can be switched on later.
 
 ```bash
-aws configure                       # or export AWS_PROFILE=...
-cd terraform
-terraform init
-terraform plan -out tfplan | tee ../docs/terraform-plan.txt
-terraform apply tfplan              # ~15-20 minutes
-$(terraform output -raw configure_kubectl)
-kubectl get nodes
+cd terraform && terraform init && terraform apply           # creates VPC + EKS (billed)
+$(terraform output -raw configure_kubectl)                   # aws eks update-kubeconfig ...
+gh secret set KUBECONFIG_B64 -R v4xsh/devops --body "$(base64 -w0 ~/.kube/config)"
 ```
 
-Screenshots to take: `terraform plan` output, AWS Console → VPC (ap-south-1) and
-AWS Console → EKS → `deskflow-eks` with its node group.
+The next push to `main` then runs the `deploy` job (`helm upgrade --install ... --set image.tag=<sha>`).
+Afterwards: `gh secret delete KUBECONFIG_B64 -R v4xsh/devops` and `terraform destroy`.
 
-Optional — deploy the app on EKS:
-
-```bash
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx --create-namespace
-helm upgrade --install metrics-server metrics-server/metrics-server -n kube-system
-kubectl apply -f k8s/namespace.yaml
-helm upgrade --install deskflow ./helm/deskflow -n deskflow --set image.tag=<latest-commit-sha> \
-  --set postgres.storageClass=gp2
-kubectl get ingress -n deskflow     # use the ELB hostname
-```
-
-(EKS 1.34 needs the EBS CSI driver add-on for the Postgres PVC; add `aws-ebs-csi-driver = {}` to
-`cluster_addons` with an IRSA/Pod Identity role, or set `postgres.enabled=false` and use RDS.)
-
-Then **always**:
-
-```bash
-helm uninstall deskflow -n deskflow; helm uninstall ingress-nginx -n ingress-nginx   # removes the ELB first
-terraform destroy                   # screenshot the "Destroy complete!" line
-```
-
-### 2. Enable the CD deploy job (optional)
-
-```bash
-gh secret set KUBECONFIG_B64 --repo v4xsh/devops --body "$(base64 -w0 ~/.kube/config)"
-```
-
-The next push to `main` will run the `deploy` job instead of skipping it. Only do this for a
-cluster reachable from GitHub's runners (EKS with a public endpoint, not kind).
-
-### 3. `/etc/hosts` for opening the kind Ingress in a normal browser
-
-```bash
-echo "127.0.0.1 deskflow.local grafana.deskflow.local prometheus.deskflow.local" | sudo tee -a /etc/hosts
-```
-
-### 4. `gh` CLI evidence from my own account (optional)
-
-```bash
-gh auth login
-gh run list --repo v4xsh/devops --limit 5
-gh run view --repo v4xsh/devops <run-id>
-```
+For opening the kind Ingress hostnames in a normal browser, add
+`127.0.0.1 deskflow.local grafana.deskflow.local prometheus.deskflow.local` to `/etc/hosts`.
