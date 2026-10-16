@@ -1,0 +1,44 @@
+# LAB 1 - ImagePullBackOff
+# The image tag below does not exist in GHCR (typo'd release tag), so the kubelet
+# can never pull it. Apply it, investigate, then follow broken-image.FIX.md.
+#
+#   kubectl apply -f troubleshooting/broken-image.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deskflow-canary
+  namespace: deskflow
+  labels:
+    app.kubernetes.io/name: deskflow-canary
+    lab: broken-image
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: deskflow-canary
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: deskflow-canary
+        lab: broken-image
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: frontend
+          image: ghcr.io/v4xsh/deskflow-frontend:v1.0.0-typo   # BUG: this tag was never pushed
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: BACKEND_URL
+              value: http://deskflow-backend:8000
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests: { cpu: 10m, memory: 16Mi }
+            limits: { cpu: 100m, memory: 64Mi }

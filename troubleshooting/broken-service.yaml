@@ -1,0 +1,22 @@
+# LAB 2 - Service with no endpoints
+# This Service is meant to expose the backend API on a second name, but its selector
+# uses a label value that no Pod carries ("api" instead of "backend").
+# Result: the Service exists, has a ClusterIP, but routes traffic nowhere.
+#
+#   kubectl apply -f troubleshooting/broken-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: deskflow-api
+  namespace: deskflow
+  labels:
+    lab: broken-service
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: deskflow
+    app.kubernetes.io/component: api   # BUG: backend Pods are labelled component=backend
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
