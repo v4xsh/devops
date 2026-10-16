@@ -1,0 +1,25 @@
+$ git log --format="%h %an <%ae> %ad %s" --date=short
+d078203 v4xsh <vanshdobhal11@gmail.com> 2026-10-16 update workflow actions to node 24 releases and pin runner image
+e06700f v4xsh <vanshdobhal11@gmail.com> 2026-10-16 write project report, design decisions and demo script
+aca8a11 v4xsh <vanshdobhal11@gmail.com> 2026-10-16 add test, scan, cluster and troubleshooting evidence
+ad0dfa9 v4xsh <vanshdobhal11@gmail.com> 2026-10-16 add script to render command output as terminal images
+72d0e0c v4xsh <vanshdobhal11@gmail.com> 2026-10-16 add troubleshooting labs for image pull and service selector failures
+6c9ada6 v4xsh <vanshdobhal11@gmail.com> 2026-10-16 add load test and screenshot helper scripts
+7c37fcf v4xsh <vanshdobhal11@gmail.com> 2026-10-16 add kind bootstrap script for the full local stack
+bd99ed6 v4xsh <vanshdobhal11@gmail.com> 2026-10-16 add prometheus stack values and grafana dashboard
+1152d9b v4xsh <vanshdobhal11@gmail.com> 2026-10-16 serve openapi schema under /api for ingress routing
+ac35a87 v4xsh <vanshdobhal11@gmail.com> 2026-10-16 add helm chart with hpa, ingress and postgres statefulset
+1ca77bf v4xsh <vanshdobhal11@gmail.com> 2026-10-16 serialize migrations across replicas with an advisory lock
+9f9dccc v4xsh <vanshdobhal11@gmail.com> 2026-10-16 add terraform for vpc and eks in ap-south-1
+d7520cb v4xsh <vanshdobhal11@gmail.com> 2026-10-16 add ci/cd pipeline with tests, trivy scan and ghcr push
+00419a1 v4xsh <vanshdobhal11@gmail.com> 2026-10-16 upgrade backend dependencies and slim runtime image
+9ae5123 v4xsh <vanshdobhal11@gmail.com> 2026-10-16 add docker compose stack with healthchecks
+b774ab8 v4xsh <vanshdobhal11@gmail.com> 2026-10-16 add multi-stage frontend image with nginx api proxy
+c656e98 v4xsh <vanshdobhal11@gmail.com> 2026-10-16 add react dashboard for support tickets
+caa1463 v4xsh <vanshdobhal11@gmail.com> 2026-10-16 add backend dockerfile running as non-root
+6643c59 v4xsh <vanshdobhal11@gmail.com> 2026-10-16 add pytest suite for health, ready and ticket CRUD
+fe52322 v4xsh <vanshdobhal11@gmail.com> 2026-10-16 add alembic migrations with initial schema and seed data
+72e6357 v4xsh <vanshdobhal11@gmail.com> 2026-10-16 add fastapi backend with ticket and agent models
+
+$ git log --oneline | wc -l
+21

@@ -1,0 +1,40 @@
+$ gh run view 38867226880 --repo v4xsh/devops --verbose   # same data via the public Actions API
+
+✓ main CI/CD · 38867226880
+Triggered via push by v4xsh · commit d078203 "update workflow actions to node 24 releases and pin runner image"
+Conclusion: SUCCESS   Run #5   https://github.com/v4xsh/devops/actions/runs/38867226880
+
+JOBS
+✓ Test (pytest + frontend build) in 0m23s
+    ✓ Run actions/checkout@v7
+    ✓ Set up Python 3.12
+    ✓ Install backend requirements
+    ✓ Run pytest
+    ✓ SAST (bandit)
+    ✓ Set up Node 20
+    ✓ Build frontend
+✓ Build, scan & push images in 1m31s
+    ✓ Run actions/checkout@v7
+    ✓ Install Trivy 0.76.0
+    ✓ Cache Trivy DB
+    ✓ Dependency, secret & IaC scan of the repository (report only)
+    ✓ Run docker/setup-buildx-action@v4
+    ✓ Log in to GHCR
+    ✓ Build backend image
+    ✓ Build frontend image
+    ✓ Trivy report (backend, SARIF)
+    ✓ Trivy report (frontend, SARIF)
+    ✓ Upload backend SARIF to Security tab
+    ✓ Upload frontend SARIF to Security tab
+    ✓ Trivy gate (backend, fixable HIGH/CRITICAL)
+    ✓ Trivy gate (frontend, fixable HIGH/CRITICAL)
+    ✓ Push images to GHCR
+    ✓ Check whether a deploy target is configured
+- Deploy with Helm (skipped: KUBECONFIG_B64 secret not configured)
+
+ANNOTATIONS
+  none (no warnings or errors)
+
+IMAGES PUSHED
+  ghcr.io/v4xsh/deskflow-backend:d078203afd23ad64c4a2d5a418cc3fc1c82545eb
+  ghcr.io/v4xsh/deskflow-frontend:d078203afd23ad64c4a2d5a418cc3fc1c82545eb
