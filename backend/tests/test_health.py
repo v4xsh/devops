@@ -45,6 +45,6 @@ def test_metrics_exposed(client):
 
 def test_openapi_docs(client):
     assert client.get("/docs").status_code == 200
-    spec = client.get("/openapi.json").json()
+    spec = client.get("/api/openapi.json").json()
     assert "/api/tickets" in spec["paths"]
     assert "Vansh Dobhal" in spec["info"]["title"]

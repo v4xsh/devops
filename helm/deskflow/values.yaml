@@ -69,10 +69,10 @@ ingress:
   className: nginx
   host: deskflow.local
   annotations: {}
-  # Extra backend paths exposed through the Ingress besides /api.
+  # Extra backend paths exposed through the Ingress besides /api
+  # (the OpenAPI schema lives at /api/openapi.json, so /docs is enough for Swagger).
   extraBackendPaths:
     - /docs
-    - /openapi.json
   tls: []
 
 autoscaling:

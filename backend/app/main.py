@@ -12,6 +12,8 @@ app = FastAPI(
         "Author: **Vansh Dobhal — Roll No. 10099**"
     ),
     version="1.0.0",
+    # Served under /api so the Ingress /api route covers it (ingress-nginx rejects "." in paths).
+    openapi_url="/api/openapi.json",
 )
 
 app.add_middleware(
