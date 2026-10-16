@@ -1,0 +1,7 @@
+$ kubectl get pods -n deskflow --show-labels | sed 's/,pod-template-hash=[a-z0-9]*//'
+NAME                                 READY   STATUS    RESTARTS   AGE   LABELS
+deskflow-backend-75b9794bf9-5zxlp    1/1     Running   0          12m   app.kubernetes.io/component=backend,app.kubernetes.io/instance=deskflow,app.kubernetes.io/name=deskflow
+deskflow-backend-75b9794bf9-dbw8k    1/1     Running   0          12m   app.kubernetes.io/component=backend,app.kubernetes.io/instance=deskflow,app.kubernetes.io/name=deskflow
+deskflow-frontend-6dbb45b65f-4pjmq   1/1     Running   0          12m   app.kubernetes.io/component=frontend,app.kubernetes.io/instance=deskflow,app.kubernetes.io/name=deskflow
+deskflow-frontend-6dbb45b65f-l2tvp   1/1     Running   0          12m   app.kubernetes.io/component=frontend,app.kubernetes.io/instance=deskflow,app.kubernetes.io/name=deskflow
+deskflow-postgres-0                  1/1     Running   0          12m   app.kubernetes.io/component=postgres,app.kubernetes.io/instance=deskflow,app.kubernetes.io/name=deskflow,apps.kubernetes.io/pod-index=0,controller-revision-hash=deskflow-postgres-7799f949dd,statefulset.kubernetes.io/pod-name=deskflow-postgres-0

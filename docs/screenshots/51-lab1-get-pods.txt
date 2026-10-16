@@ -1,0 +1,3 @@
+$ kubectl get pods -n deskflow -l lab=broken-image
+NAME                              READY   STATUS             RESTARTS   AGE
+deskflow-canary-f694757cf-6gxj9   0/1     ImagePullBackOff   0          45s

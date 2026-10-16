@@ -1,0 +1,8 @@
+$ kubectl get ingress -A; echo; curl -s -H 'Host: deskflow.local' http://localhost/api/tickets/stats; echo; curl -s -o /dev/null -w 'GET http://deskflow.local/ -> %{http_code}\n' -H 'Host: deskflow.local' http://localhost/
+NAMESPACE    NAME                               CLASS   HOSTS                       ADDRESS     PORTS   AGE
+deskflow     deskflow                           nginx   deskflow.local              localhost   80      2m
+monitoring   kube-prometheus-stack-grafana      nginx   grafana.deskflow.local      localhost   80      5m32s
+monitoring   kube-prometheus-stack-prometheus   nginx   prometheus.deskflow.local   localhost   80      5m32s
+
+{"total":10,"by_status":{"open":4,"in_progress":3,"resolved":2,"closed":1},"by_priority":{"low":2,"medium":3,"high":3,"urgent":2},"open_urgent":2,"unassigned":2,"resolution_rate":30.0}
+GET http://deskflow.local/ -> 200

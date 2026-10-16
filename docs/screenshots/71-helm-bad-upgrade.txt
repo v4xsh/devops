@@ -1,0 +1,14 @@
+$ helm upgrade deskflow helm/deskflow -n deskflow -f helm/deskflow/values-dev.yaml --set image.tag=broken-tag --set frontend.replicaCount=3 --wait --timeout 90s; echo; kubectl get pods -n deskflow; echo; curl -s -o /dev/null -w 'app still served during failed rollout: HTTP %{http_code}\n' -H 'Host: deskflow.local' http://localhost/api/tickets
+Error: UPGRADE FAILED: context deadline exceeded
+
+NAME                                 READY   STATUS             RESTARTS   AGE
+deskflow-backend-78458778f5-xxtdn    0/1     ImagePullBackOff   0          90s
+deskflow-backend-796ffc4cd9-dcz7p    1/1     Running            0          115s
+deskflow-backend-796ffc4cd9-gr4kr    1/1     Running            0          105s
+deskflow-frontend-76b8d4f477-fbsfs   0/1     ImagePullBackOff   0          90s
+deskflow-frontend-86699dfdf-5gqjc    1/1     Running            0          102s
+deskflow-frontend-86699dfdf-r6rsv    1/1     Running            0          105s
+deskflow-frontend-86699dfdf-zcjcb    1/1     Running            0          115s
+deskflow-postgres-0                  1/1     Running            0          15m
+
+app still served during failed rollout: HTTP 200

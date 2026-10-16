@@ -1,0 +1,42 @@
+$ docker run --rm -v $PWD/backend:/src:ro -w /src python:3.12-slim sh -c 'pip install -q --root-user-action=ignore --disable-pip-version-check -r requirements-dev.txt >/dev/null 2>&1 && python --version && cp -r /src /tmp/app && cd /tmp/app && pytest -v -p no:cacheprovider'
+Python 3.12.15
+============================= test session starts ==============================
+platform linux -- Python 3.12.15, pytest-9.1.1, pluggy-1.7.0 -- /usr/local/bin/python3.12
+rootdir: /tmp/app
+configfile: pytest.ini
+testpaths: tests
+plugins: anyio-4.15.1
+collecting ... collected 30 items
+
+tests/test_agents.py::test_list_agents_empty PASSED                      [  3%]
+tests/test_agents.py::test_create_and_list_agent PASSED                  [  6%]
+tests/test_agents.py::test_create_agent_duplicate_email_conflict PASSED  [ 10%]
+tests/test_agents.py::test_create_agent_invalid_email PASSED             [ 13%]
+tests/test_health.py::test_root PASSED                                   [ 16%]
+tests/test_health.py::test_health PASSED                                 [ 20%]
+tests/test_health.py::test_ready_when_database_ok PASSED                 [ 23%]
+tests/test_health.py::test_ready_returns_503_when_database_down PASSED   [ 26%]
+tests/test_health.py::test_metrics_exposed PASSED                        [ 30%]
+tests/test_health.py::test_openapi_docs PASSED                           [ 33%]
+tests/test_tickets.py::test_list_tickets_empty PASSED                    [ 36%]
+tests/test_tickets.py::test_create_ticket PASSED                         [ 40%]
+tests/test_tickets.py::test_create_ticket_defaults PASSED                [ 43%]
+tests/test_tickets.py::test_get_ticket PASSED                            [ 46%]
+tests/test_tickets.py::test_get_ticket_404 PASSED                        [ 50%]
+tests/test_tickets.py::test_update_ticket PASSED                         [ 53%]
+tests/test_tickets.py::test_update_ticket_unassign PASSED                [ 56%]
+tests/test_tickets.py::test_update_ticket_404 PASSED                     [ 60%]
+tests/test_tickets.py::test_delete_ticket PASSED                         [ 63%]
+tests/test_tickets.py::test_delete_ticket_404 PASSED                     [ 66%]
+tests/test_tickets.py::test_create_ticket_validation_errors[payload0] PASSED [ 70%]
+tests/test_tickets.py::test_create_ticket_validation_errors[payload1] PASSED [ 73%]
+tests/test_tickets.py::test_create_ticket_validation_errors[payload2] PASSED [ 76%]
+tests/test_tickets.py::test_create_ticket_validation_errors[payload3] PASSED [ 80%]
+tests/test_tickets.py::test_create_ticket_unknown_assignee PASSED        [ 83%]
+tests/test_tickets.py::test_update_ticket_invalid_status PASSED          [ 86%]
+tests/test_tickets.py::test_filter_tickets PASSED                        [ 90%]
+tests/test_tickets.py::test_stats PASSED                                 [ 93%]
+tests/test_tickets.py::test_stats_empty PASSED                           [ 96%]
+tests/test_tickets.py::test_activity_feed PASSED                         [100%]
+
+============================== 30 passed in 0.45s ==============================

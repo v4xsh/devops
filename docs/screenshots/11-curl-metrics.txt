@@ -1,0 +1,8 @@
+$ curl -s localhost:8000/metrics | grep -E '^(http_requests_total|http_request_duration_seconds_count|process_cpu)' | head -20
+process_cpu_seconds_total 0.8400000000000001
+http_requests_total{handler="/ready",method="GET",status="2xx"} 3.0
+http_requests_total{handler="/health",method="GET",status="2xx"} 1.0
+http_requests_total{handler="/",method="GET",status="2xx"} 1.0
+http_request_duration_seconds_count{handler="/ready",method="GET"} 3.0
+http_request_duration_seconds_count{handler="/health",method="GET"} 1.0
+http_request_duration_seconds_count{handler="/",method="GET"} 1.0

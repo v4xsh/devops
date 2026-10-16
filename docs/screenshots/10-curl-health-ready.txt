@@ -1,0 +1,4 @@
+$ curl -s localhost:8000/health; echo; curl -s localhost:8000/ready; echo; curl -s localhost:8000/; echo
+{"status":"ok"}
+{"status":"ready","database":"ok"}
+{"service":"deskflow-backend","version":"1.0.0","environment":"compose","author":"Vansh Dobhal — Roll No. 10099","docs":"/docs"}

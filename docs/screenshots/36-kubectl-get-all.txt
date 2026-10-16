@@ -1,0 +1,21 @@
+$ kubectl get deploy,sts,pvc,configmap,secret,servicemonitor -n deskflow
+NAME                                READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/deskflow-backend    2/2     2            2           2m
+deployment.apps/deskflow-frontend   2/2     2            2           2m
+
+NAME                                 READY   AGE
+statefulset.apps/deskflow-postgres   1/1     2m
+
+NAME                                             STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+persistentvolumeclaim/data-deskflow-postgres-0   Bound    pvc-bfc07db6-6f42-45bd-a0bb-5ffe98165c8b   1Gi        RWO            standard       <unset>                 2m
+
+NAME                         DATA   AGE
+configmap/deskflow-config    6      2m
+configmap/kube-root-ca.crt   1      3m33s
+
+NAME                                    TYPE                 DATA   AGE
+secret/deskflow-postgres                Opaque               1      2m
+secret/sh.helm.release.v1.deskflow.v1   helm.sh/release.v1   1      2m
+
+NAME                                                    AGE
+servicemonitor.monitoring.coreos.com/deskflow-backend   2m

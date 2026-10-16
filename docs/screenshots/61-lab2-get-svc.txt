@@ -1,0 +1,6 @@
+$ kubectl get svc -n deskflow
+NAME                TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+deskflow-api        ClusterIP   10.96.245.77    <none>        8000/TCP   3s
+deskflow-backend    ClusterIP   10.96.44.166    <none>        8000/TCP   12m
+deskflow-frontend   ClusterIP   10.96.127.162   <none>        80/TCP     12m
+deskflow-postgres   ClusterIP   None            <none>        5432/TCP   12m

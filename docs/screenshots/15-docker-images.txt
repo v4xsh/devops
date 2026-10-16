@@ -1,0 +1,13 @@
+$ docker images --format 'table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.Size}}' | grep -E 'REPOSITORY|deskflow' | head -12; echo; docker image inspect ghcr.io/v4xsh/deskflow-backend:72d0e0c --format 'backend  runs as user: {{.Config.User}}'; docker image inspect ghcr.io/v4xsh/deskflow-frontend:72d0e0c --format 'frontend runs as user: {{.Config.User}}'
+REPOSITORY                        TAG           IMAGE ID       SIZE
+ghcr.io/v4xsh/deskflow-frontend   72d0e0c       a9665148d033   60.1MB
+ghcr.io/v4xsh/deskflow-backend    72d0e0c       9b7c190901a7   217MB
+ghcr.io/v4xsh/deskflow-backend    7c37fcf       9b7c190901a7   217MB
+ghcr.io/v4xsh/deskflow-backend    ac35a87       9b7c190901a7   217MB
+deskflow-backend                  local         a1bb460ce812   217MB
+ghcr.io/v4xsh/deskflow-frontend   7c37fcf       d7ba37736efe   60.1MB
+ghcr.io/v4xsh/deskflow-frontend   ac35a87       d7ba37736efe   60.1MB
+deskflow-frontend                 local         7049bcfb0bc1   60.1MB
+
+backend  runs as user: 10001
+frontend runs as user: 101

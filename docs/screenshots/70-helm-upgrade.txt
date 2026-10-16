@@ -1,0 +1,13 @@
+$ helm upgrade deskflow helm/deskflow -n deskflow -f helm/deskflow/values-dev.yaml --set image.tag=72d0e0c --set frontend.replicaCount=3 --wait --timeout 5m | head -8; echo; kubectl get deploy -n deskflow -o wide
+Release "deskflow" has been upgraded. Happy Helming!
+NAME: deskflow
+LAST DEPLOYED: Fri Oct 16 12:42:59 2026
+NAMESPACE: deskflow
+STATUS: deployed
+REVISION: 2
+TEST SUITE: None
+NOTES:
+
+NAME                READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES                                    SELECTOR
+deskflow-backend    2/2     2            2           13m   backend      ghcr.io/v4xsh/deskflow-backend:72d0e0c    app.kubernetes.io/component=backend,app.kubernetes.io/instance=deskflow,app.kubernetes.io/name=deskflow
+deskflow-frontend   3/3     3            3           13m   frontend     ghcr.io/v4xsh/deskflow-frontend:72d0e0c   app.kubernetes.io/component=frontend,app.kubernetes.io/instance=deskflow,app.kubernetes.io/name=deskflow

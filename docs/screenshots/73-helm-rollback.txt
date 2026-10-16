@@ -1,0 +1,16 @@
+$ helm rollback deskflow 2 -n deskflow --wait --timeout 3m; echo; kubectl get pods -n deskflow; echo; kubectl get deploy -n deskflow -o custom-columns=NAME:.metadata.name,READY:.status.readyReplicas,IMAGE:.spec.template.spec.containers[0].image
+Rollback was a success! Happy Helming!
+
+NAME                                 READY   STATUS        RESTARTS   AGE
+deskflow-backend-78458778f5-xxtdn    0/1     Terminating   0          96s
+deskflow-backend-796ffc4cd9-dcz7p    1/1     Running       0          2m1s
+deskflow-backend-796ffc4cd9-gr4kr    1/1     Running       0          111s
+deskflow-frontend-76b8d4f477-fbsfs   0/1     Terminating   0          96s
+deskflow-frontend-86699dfdf-5gqjc    1/1     Running       0          108s
+deskflow-frontend-86699dfdf-r6rsv    1/1     Running       0          111s
+deskflow-frontend-86699dfdf-zcjcb    1/1     Running       0          2m1s
+deskflow-postgres-0                  1/1     Running       0          15m
+
+NAME                READY   IMAGE
+deskflow-backend    2       ghcr.io/v4xsh/deskflow-backend:72d0e0c
+deskflow-frontend   3       ghcr.io/v4xsh/deskflow-frontend:72d0e0c

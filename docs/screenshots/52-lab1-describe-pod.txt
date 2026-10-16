@@ -1,0 +1,20 @@
+$ kubectl describe pod deskflow-canary-f694757cf-6gxj9 -n deskflow | sed -n '/^Containers:/,/^    Ready:/p;/^Events:/,$p'
+Containers:
+  frontend:
+    Container ID:   
+    Image:          ghcr.io/v4xsh/deskflow-frontend:v1.0.0-typo
+    Image ID:       
+    Port:           8080/TCP
+    Host Port:      0/TCP
+    State:          Waiting
+      Reason:       ImagePullBackOff
+    Ready:          False
+Events:
+  Type     Reason     Age                From               Message
+  ----     ------     ----               ----               -------
+  Normal   Scheduled  45s                default-scheduler  Successfully assigned deskflow/deskflow-canary-f694757cf-6gxj9 to deskflow-worker2
+  Normal   BackOff    20s (x2 over 43s)  kubelet            Back-off pulling image "ghcr.io/v4xsh/deskflow-frontend:v1.0.0-typo"
+  Warning  Failed     20s (x2 over 43s)  kubelet            Error: ImagePullBackOff
+  Normal   Pulling    6s (x3 over 44s)   kubelet            Pulling image "ghcr.io/v4xsh/deskflow-frontend:v1.0.0-typo"
+  Warning  Failed     5s (x3 over 43s)   kubelet            Failed to pull image "ghcr.io/v4xsh/deskflow-frontend:v1.0.0-typo": rpc error: code = NotFound desc = failed to pull and unpack image "ghcr.io/v4xsh/deskflow-frontend:v1.0.0-typo": failed to resolve reference "ghcr.io/v4xsh/deskflow-frontend:v1.0.0-typo": ghcr.io/v4xsh/deskflow-frontend:v1.0.0-typo: not found
+  Warning  Failed     5s (x3 over 43s)   kubelet            Error: ErrImagePull

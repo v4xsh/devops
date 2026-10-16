@@ -1,0 +1,8 @@
+$ helm list -n deskflow; echo; helm list -A
+NAME    	NAMESPACE	REVISION	UPDATED                                	STATUS  	CHART         	APP VERSION
+deskflow	deskflow 	4       	2026-10-16 12:45:00.568608744 +0530 IST	deployed	deskflow-0.1.0	1.0.0      
+
+NAME                 	NAMESPACE  	REVISION	UPDATED                                	STATUS  	CHART                       	APP VERSION
+deskflow             	deskflow   	4       	2026-10-16 12:45:00.568608744 +0530 IST	deployed	deskflow-0.1.0              	1.0.0      
+kube-prometheus-stack	monitoring 	2       	2026-10-16 12:28:52.143108693 +0530 IST	deployed	kube-prometheus-stack-92.9.0	v0.94.1    
+metrics-server       	kube-system	2       	2026-10-16 12:28:45.554674912 +0530 IST	deployed	metrics-server-3.14.0       	0.9.0      

@@ -1,0 +1,28 @@
+$ kubectl get hpa -n deskflow
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+deskflow-backend   Deployment/deskflow-backend   cpu: 452%/60%   2         6         6          8m41s
+
+$ kubectl top pods -n deskflow
+NAME                                 CPU(cores)   MEMORY(bytes)   
+deskflow-backend-75b9794bf9-5zxlp    227m         80Mi            
+deskflow-backend-75b9794bf9-dbw8k    219m         82Mi            
+deskflow-backend-75b9794bf9-f8t7h    225m         84Mi            
+deskflow-backend-75b9794bf9-v2m24    234m         74Mi            
+deskflow-backend-75b9794bf9-vpgsd    224m         74Mi            
+deskflow-backend-75b9794bf9-z2spz    229m         95Mi            
+deskflow-frontend-6dbb45b65f-4pjmq   1m           12Mi            
+deskflow-frontend-6dbb45b65f-l2tvp   1m           12Mi            
+deskflow-postgres-0                  500m         187Mi           
+
+$ kubectl describe hpa deskflow-backend -n deskflow (events)
+Events:
+  Type     Reason                        Age                    From                       Message
+  ----     ------                        ----                   ----                       -------
+  Normal   SuccessfulRescale             8m40s                  horizontal-pod-autoscaler  New size: 2; reason: Current number of replicas below Spec.MinReplicas
+  Warning  FailedGetResourceMetric       7m55s (x3 over 8m25s)  horizontal-pod-autoscaler  failed to get cpu utilization: unable to get metrics for resource cpu: no metrics returned from resource metrics API
+  Warning  FailedComputeMetricsReplicas  7m55s (x3 over 8m25s)  horizontal-pod-autoscaler  invalid metrics (1 invalid out of 1), first error is: failed to get cpu resource metric value: failed to get cpu utilization: unable to get metrics for resource cpu: no metrics returned from resource metrics API
+  Warning  FailedGetResourceMetric       7m40s                  horizontal-pod-autoscaler  failed to get cpu utilization: did not receive metrics for targeted pods (pods might be unready)
+  Warning  FailedComputeMetricsReplicas  7m40s                  horizontal-pod-autoscaler  invalid metrics (1 invalid out of 1), first error is: failed to get cpu resource metric value: failed to get cpu utilization: did not receive metrics for targeted pods (pods might be unready)
+  Normal   SuccessfulRescale             4m39s                  horizontal-pod-autoscaler  New size: 2; reason: All metrics below target
+  Normal   SuccessfulRescale             3m54s (x2 over 6m40s)  horizontal-pod-autoscaler  New size: 4; reason: cpu resource utilization (percentage of request) above target
+  Normal   SuccessfulRescale             3m23s                  horizontal-pod-autoscaler  New size: 6; reason: cpu resource utilization (percentage of request) above target

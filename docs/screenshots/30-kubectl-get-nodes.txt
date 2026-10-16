@@ -1,0 +1,5 @@
+$ kubectl get nodes -o wide
+NAME                     STATUS   ROLES           AGE     VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION    CONTAINER-RUNTIME
+deskflow-control-plane   Ready    control-plane   8m13s   v1.31.0   172.21.0.3    <none>        Debian GNU/Linux 12 (bookworm)   6.6.119-1-lts66   containerd://1.7.18
+deskflow-worker          Ready    <none>          8m3s    v1.31.0   172.21.0.2    <none>        Debian GNU/Linux 12 (bookworm)   6.6.119-1-lts66   containerd://1.7.18
+deskflow-worker2         Ready    <none>          8m3s    v1.31.0   172.21.0.4    <none>        Debian GNU/Linux 12 (bookworm)   6.6.119-1-lts66   containerd://1.7.18

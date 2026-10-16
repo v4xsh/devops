@@ -1,0 +1,6 @@
+$ kubectl get endpoints deskflow-api -n deskflow; echo; kubectl exec -n deskflow deploy/deskflow-frontend -- wget -qO- -T 5 http://deskflow-api:8000/health; echo; echo exit=$?
+NAME           ENDPOINTS                          AGE
+deskflow-api   10.244.1.15:8000,10.244.2.9:8000   13s
+
+{"status":"ok"}
+exit=0

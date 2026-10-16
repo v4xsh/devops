@@ -1,0 +1,7 @@
+$ kubectl get endpoints deskflow-api deskflow-backend -n deskflow; echo; kubectl describe svc deskflow-api -n deskflow | grep -E 'Selector|Endpoints'
+NAME               ENDPOINTS                          AGE
+deskflow-api       <none>                             3s
+deskflow-backend   10.244.1.15:8000,10.244.2.9:8000   12m
+
+Selector:                 app.kubernetes.io/component=api,app.kubernetes.io/name=deskflow
+Endpoints:                

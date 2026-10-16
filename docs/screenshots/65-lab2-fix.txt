@@ -1,0 +1,2 @@
+$ kubectl patch svc deskflow-api -n deskflow --type merge -p '{"spec":{"selector":{"app.kubernetes.io/name":"deskflow","app.kubernetes.io/component":"backend"}}}'
+service/deskflow-api patched

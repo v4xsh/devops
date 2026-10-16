@@ -1,0 +1,2 @@
+$ kubectl apply -f troubleshooting/broken-service.yaml
+service/deskflow-api created

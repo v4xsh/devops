@@ -1,0 +1,27 @@
+$ docker compose up --build -d 2>&1 | grep -vE '^#[0-9]+ (sha256|extracting|resolve|transferring|\[internal\]|DONE 0\.0s|CACHED)' | grep -E 'Built|Container|Network|Volume|naming to|exporting to image' ; sleep 12; docker compose ps --format 'table {{.Service}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
+#16 [backend] exporting to image
+#16 naming to docker.io/library/deskflow-backend:local done
+#33 [frontend] exporting to image
+#33 naming to docker.io/library/deskflow-frontend:local done
+ Network deskflow_default  Creating
+ Network deskflow_default  Created
+ Container deskflow-db-1  Creating
+ Container deskflow-db-1  Created
+ Container deskflow-backend-1  Creating
+ Container deskflow-backend-1  Created
+ Container deskflow-frontend-1  Creating
+ Container deskflow-frontend-1  Created
+ Container deskflow-db-1  Starting
+ Container deskflow-db-1  Started
+ Container deskflow-db-1  Waiting
+ Container deskflow-db-1  Healthy
+ Container deskflow-backend-1  Starting
+ Container deskflow-backend-1  Started
+ Container deskflow-backend-1  Waiting
+ Container deskflow-backend-1  Healthy
+ Container deskflow-frontend-1  Starting
+ Container deskflow-frontend-1  Started
+SERVICE    IMAGE                     STATUS                             PORTS
+backend    deskflow-backend:local    Up 17 seconds (healthy)            0.0.0.0:8000->8000/tcp, :::8000->8000/tcp
+db         postgres:16-alpine        Up 23 seconds (healthy)            5432/tcp
+frontend   deskflow-frontend:local   Up 12 seconds (health: starting)   0.0.0.0:3000->8080/tcp, [::]:3000->8080/tcp

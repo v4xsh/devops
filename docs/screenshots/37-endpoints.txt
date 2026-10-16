@@ -1,0 +1,5 @@
+$ kubectl get endpoints -n deskflow
+NAME                ENDPOINTS                                            AGE
+deskflow-backend    10.244.1.22:8000,10.244.2.15:8000                    15m
+deskflow-frontend   10.244.1.24:8080,10.244.1.25:8080,10.244.2.14:8080   15m
+deskflow-postgres   10.244.2.10:5432                                     15m

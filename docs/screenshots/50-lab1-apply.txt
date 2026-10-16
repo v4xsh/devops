@@ -1,0 +1,2 @@
+$ kubectl apply -f troubleshooting/broken-image.yaml
+deployment.apps/deskflow-canary created

@@ -1,0 +1,22 @@
+$ kubectl get hpa -n deskflow -w
+NAME               REFERENCE                     TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+deskflow-backend   Deployment/deskflow-backend   cpu: 4%/60%   2         6         2          4m30s
+deskflow-backend   Deployment/deskflow-backend   cpu: 123%/60%   2         6         2          4m47s
+deskflow-backend   Deployment/deskflow-backend   cpu: 602%/60%   2         6         4          5m2s
+deskflow-backend   Deployment/deskflow-backend   cpu: 597%/60%   2         6         4          5m18s
+deskflow-backend   Deployment/deskflow-backend   cpu: 594%/60%   2         6         6          5m33s
+deskflow-backend   Deployment/deskflow-backend   cpu: 506%/60%   2         6         6          5m49s
+deskflow-backend   Deployment/deskflow-backend   cpu: 458%/60%   2         6         6          6m4s
+deskflow-backend   Deployment/deskflow-backend   cpu: 460%/60%   2         6         6          6m19s
+deskflow-backend   Deployment/deskflow-backend   cpu: 444%/60%   2         6         6          6m34s
+deskflow-backend   Deployment/deskflow-backend   cpu: 452%/60%   2         6         6          6m50s
+deskflow-backend   Deployment/deskflow-backend   cpu: 475%/60%   2         6         6          7m8s
+deskflow-backend   Deployment/deskflow-backend   cpu: 470%/60%   2         6         6          7m23s
+deskflow-backend   Deployment/deskflow-backend   cpu: 467%/60%   2         6         6          7m38s
+deskflow-backend   Deployment/deskflow-backend   cpu: 457%/60%   2         6         6          7m53s
+deskflow-backend   Deployment/deskflow-backend   cpu: 450%/60%   2         6         6          8m8s
+deskflow-backend   Deployment/deskflow-backend   cpu: 452%/60%   2         6         6          8m23s
+deskflow-backend   Deployment/deskflow-backend   cpu: 347%/60%   2         6         6          8m53s
+deskflow-backend   Deployment/deskflow-backend   cpu: 14%/60%    2         6         6          9m8s
+deskflow-backend   Deployment/deskflow-backend   cpu: 5%/60%     2         6         6          9m23s
+deskflow-backend   Deployment/deskflow-backend   cpu: 4%/60%     2         6         6          9m38s

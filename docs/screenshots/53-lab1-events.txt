@@ -1,0 +1,8 @@
+$ kubectl get events -n deskflow --sort-by=.lastTimestamp --field-selector involvedObject.name=deskflow-canary-f694757cf-6gxj9
+LAST SEEN   TYPE      REASON      OBJECT                                MESSAGE
+45s         Normal    Scheduled   pod/deskflow-canary-f694757cf-6gxj9   Successfully assigned deskflow/deskflow-canary-f694757cf-6gxj9 to deskflow-worker2
+20s         Normal    BackOff     pod/deskflow-canary-f694757cf-6gxj9   Back-off pulling image "ghcr.io/v4xsh/deskflow-frontend:v1.0.0-typo"
+20s         Warning   Failed      pod/deskflow-canary-f694757cf-6gxj9   Error: ImagePullBackOff
+6s          Normal    Pulling     pod/deskflow-canary-f694757cf-6gxj9   Pulling image "ghcr.io/v4xsh/deskflow-frontend:v1.0.0-typo"
+5s          Warning   Failed      pod/deskflow-canary-f694757cf-6gxj9   Failed to pull image "ghcr.io/v4xsh/deskflow-frontend:v1.0.0-typo": rpc error: code = NotFound desc = failed to pull and unpack image "ghcr.io/v4xsh/deskflow-frontend:v1.0.0-typo": failed to resolve reference "ghcr.io/v4xsh/deskflow-frontend:v1.0.0-typo": ghcr.io/v4xsh/deskflow-frontend:v1.0.0-typo: not found
+5s          Warning   Failed      pod/deskflow-canary-f694757cf-6gxj9   Error: ErrImagePull

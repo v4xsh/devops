@@ -1,0 +1,57 @@
+$ curl -s -X POST localhost:8000/api/tickets -H 'Content-Type: application/json' -d '{"title":"VPN drops every 10 minutes","customer":"Contoso","priority":"high","assignee_id":2}' | python3 -m json.tool; curl -s localhost:8000/api/tickets/11 | python3 -m json.tool; curl -s -X PUT localhost:8000/api/tickets/11 -H 'Content-Type: application/json' -d '{"status":"resolved"}' | python3 -m json.tool; curl -s localhost:8000/api/tickets/stats | python3 -m json.tool; curl -s -o /dev/null -w 'DELETE /api/tickets/11 -> %{http_code}\n' -X DELETE localhost:8000/api/tickets/11; curl -s -o /dev/null -w 'GET /api/tickets/11 after delete -> %{http_code}\n' localhost:8000/api/tickets/11
+{
+    "title": "VPN drops every 10 minutes",
+    "description": "",
+    "status": "open",
+    "priority": "high",
+    "customer": "Contoso",
+    "assignee_id": 2,
+    "id": 11,
+    "assignee_name": "Priya Nair",
+    "created_at": "2026-10-16T06:40:55.616576Z",
+    "updated_at": "2026-10-16T06:40:55.616580Z"
+}
+{
+    "title": "VPN drops every 10 minutes",
+    "description": "",
+    "status": "open",
+    "priority": "high",
+    "customer": "Contoso",
+    "assignee_id": 2,
+    "id": 11,
+    "assignee_name": "Priya Nair",
+    "created_at": "2026-10-16T06:40:55.616576Z",
+    "updated_at": "2026-10-16T06:40:55.616580Z"
+}
+{
+    "title": "VPN drops every 10 minutes",
+    "description": "",
+    "status": "resolved",
+    "priority": "high",
+    "customer": "Contoso",
+    "assignee_id": 2,
+    "id": 11,
+    "assignee_name": "Priya Nair",
+    "created_at": "2026-10-16T06:40:55.616576Z",
+    "updated_at": "2026-10-16T06:40:55.740080Z"
+}
+{
+    "total": 11,
+    "by_status": {
+        "open": 4,
+        "in_progress": 3,
+        "resolved": 3,
+        "closed": 1
+    },
+    "by_priority": {
+        "low": 2,
+        "medium": 3,
+        "high": 4,
+        "urgent": 2
+    },
+    "open_urgent": 2,
+    "unassigned": 2,
+    "resolution_rate": 36.4
+}
+DELETE /api/tickets/11 -> 204
+GET /api/tickets/11 after delete -> 404

@@ -1,0 +1,11 @@
+$ kubectl get hpa -n deskflow; echo; kubectl top pods -n deskflow
+NAME               REFERENCE                     TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+deskflow-backend   Deployment/deskflow-backend   cpu: 4%/60%   2         6         2          15m
+
+NAME                                CPU(cores)   MEMORY(bytes)   
+deskflow-backend-796ffc4cd9-dcz7p   2m           96Mi            
+deskflow-backend-796ffc4cd9-gr4kr   2m           89Mi            
+deskflow-frontend-86699dfdf-5gqjc   1m           12Mi            
+deskflow-frontend-86699dfdf-r6rsv   1m           12Mi            
+deskflow-frontend-86699dfdf-zcjcb   1m           12Mi            
+deskflow-postgres-0                 4m           34Mi            

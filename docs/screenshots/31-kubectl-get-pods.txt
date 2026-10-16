@@ -1,0 +1,8 @@
+$ kubectl get pods -n deskflow -o wide
+NAME                                READY   STATUS    RESTARTS   AGE     IP            NODE               NOMINATED NODE   READINESS GATES
+deskflow-backend-796ffc4cd9-dcz7p   1/1     Running   0          2m14s   10.244.1.22   deskflow-worker2   <none>           <none>
+deskflow-backend-796ffc4cd9-gr4kr   1/1     Running   0          2m4s    10.244.2.15   deskflow-worker    <none>           <none>
+deskflow-frontend-86699dfdf-5gqjc   1/1     Running   0          2m1s    10.244.1.25   deskflow-worker2   <none>           <none>
+deskflow-frontend-86699dfdf-r6rsv   1/1     Running   0          2m4s    10.244.2.14   deskflow-worker    <none>           <none>
+deskflow-frontend-86699dfdf-zcjcb   1/1     Running   0          2m14s   10.244.1.24   deskflow-worker2   <none>           <none>
+deskflow-postgres-0                 1/1     Running   0          15m     10.244.2.10   deskflow-worker    <none>           <none>

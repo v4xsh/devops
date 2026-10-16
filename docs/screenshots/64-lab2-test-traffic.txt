@@ -1,0 +1,4 @@
+$ kubectl exec -n deskflow deploy/deskflow-frontend -- wget -qO- -T 5 http://deskflow-api:8000/health; echo exit=$?
+wget: can't connect to remote host (10.96.245.77): Connection refused
+command terminated with exit code 1
+exit=1

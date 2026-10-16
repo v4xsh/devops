@@ -1,0 +1,6 @@
+$ kubectl get pods -n deskflow -l lab=broken-image; echo; kubectl get deployment deskflow-canary -n deskflow -o jsonpath='{.spec.template.spec.containers[0].image}'; echo
+NAME                               READY   STATUS        RESTARTS   AGE
+deskflow-canary-57d557d9d7-slbsx   1/1     Running       0          4s
+deskflow-canary-f694757cf-6gxj9    0/1     Terminating   0          57s
+
+ghcr.io/v4xsh/deskflow-frontend:d7520cb8e0e8f8323c7c64e713e0e29256bd3287

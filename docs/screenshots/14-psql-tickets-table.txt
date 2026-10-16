@@ -1,0 +1,30 @@
+$ docker compose exec -T db psql -U deskflow -d deskflow -c '\dt' -c 'SELECT id, left(title,36) AS title, status, priority, customer, assignee_id FROM tickets ORDER BY id;' -c 'SELECT version_num FROM alembic_version;'
+              List of relations
+ Schema |      Name       | Type  |  Owner   
+--------+-----------------+-------+----------
+ public | agents          | table | deskflow
+ public | alembic_version | table | deskflow
+ public | ticket_events   | table | deskflow
+ public | tickets         | table | deskflow
+(4 rows)
+
+ id |                title                 |   status    | priority |     customer     | assignee_id 
+----+--------------------------------------+-------------+----------+------------------+-------------
+  1 | Cannot log in after password reset   | open        | urgent   | Acme Retail      |           1
+  2 | Invoice shows wrong GST amount       | in_progress | high     | Northwind Foods  |           3
+  3 | Export to CSV times out              | in_progress | medium   | Globex Logistics |           4
+  4 | Add SSO for new subsidiary           | open        | medium   | Initech          |            
+  5 | Mobile app crashes on Android 14     | open        | high     | Umbrella Health  |           2
+  6 | Webhook retries not firing           | resolved    | high     | Stark Payments   |           4
+  7 | Update billing address               | closed      | low      | Wayne Analytics  |           3
+  8 | Dashboard loads slowly in the mornin | resolved    | medium   | Acme Retail      |           2
+  9 | Request: dark mode for agent console | open        | low      | Internal         |            
+ 10 | 2FA codes arrive late                | in_progress | urgent   | Hooli Bank       |           1
+ 11 | Payment page shows 502 error         | open        | urgent   | Contoso Pharma   |           4
+(11 rows)
+
+ version_num 
+-------------
+ 0002
+(1 row)
+

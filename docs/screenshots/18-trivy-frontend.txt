@@ -1,0 +1,14 @@
+$ trivy image --quiet --severity HIGH,CRITICAL --exit-code 1 ghcr.io/v4xsh/deskflow-frontend:72d0e0c; echo 'gate exit code:' $?
+
+Report Summary
+
+┌─────────────────────────────────────────────────────────┬────────┬─────────────────┬─────────┐
+│                         Target                          │  Type  │ Vulnerabilities │ Secrets │
+├─────────────────────────────────────────────────────────┼────────┼─────────────────┼─────────┤
+│ ghcr.io/v4xsh/deskflow-frontend:72d0e0c (alpine 3.21.3) │ alpine │        0        │    -    │
+└─────────────────────────────────────────────────────────┴────────┴─────────────────┴─────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+gate exit code: 0

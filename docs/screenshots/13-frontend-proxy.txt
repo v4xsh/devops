@@ -1,0 +1,7 @@
+$ curl -s -o /dev/null -w 'GET :3000/ -> %{http_code}\n' localhost:3000/; curl -s localhost:3000/api/tickets/stats; echo; curl -s localhost:3000/api/tickets?status=open | python3 -c 'import json,sys; [print(t["id"], t["status"], t["priority"], t["title"]) for t in json.load(sys.stdin)]'
+GET :3000/ -> 200
+{"total":10,"by_status":{"open":4,"in_progress":3,"resolved":2,"closed":1},"by_priority":{"low":2,"medium":3,"high":3,"urgent":2},"open_urgent":2,"unassigned":2,"resolution_rate":30.0}
+1 open urgent Cannot log in after password reset
+4 open medium Add SSO for new subsidiary
+5 open high Mobile app crashes on Android 14
+9 open low Request: dark mode for agent console
