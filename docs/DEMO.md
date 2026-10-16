@@ -6,6 +6,10 @@ Order: Application → Git commit → CI pipeline → Docker image → Security 
 Terraform → Kubernetes → Helm → Ingress → Autoscaling → Monitoring → Troubleshooting.
 Allow ~20 minutes. Commands assume the repo root.
 
+> **Scope:** the AWS VPC + EKS infrastructure in ap-south-1 is defined as code. To avoid cloud
+> cost, the Kubernetes deployment is demonstrated on a local kind cluster using the same Helm
+> chart. The EKS deploy path is wired in CI behind the `KUBECONFIG_B64` secret.
+
 ## Before the session (15 min earlier)
 
 ```bash
@@ -81,6 +85,13 @@ the pipeline stops and no image is produced. **build-scan-push** builds both ima
 them, pushes them. **deploy** runs Helm against a cluster — it's skipped here because no
 cluster secret is configured, and it's designed to skip cleanly rather than fail."
 
+From the terminal:
+
+```bash
+gh run list -R v4xsh/devops -L 5
+gh run watch -R v4xsh/devops          # live view of the run for the new commit
+```
+
 Optional, to prove the gate: show `backend/tests/` and run locally
 
 ```bash
@@ -100,13 +111,18 @@ into an unprivileged Nginx image — 60 MB, no Node inside. Both images run as n
 
 ## 5. Security scan (1.5 min)
 
-**Show:** the `build-scan-push` job log → *Trivy gate* steps, then the repo's
+**Show:** the `build-scan-push` job log → *Trivy report* and *Trivy gate* steps, then the repo's
 **Security → Code scanning** tab.
 
 ```bash
+gh run view <run-id> -R v4xsh/devops --log | grep -A12 'Trivy gate (frontend'
+gh api repos/v4xsh/devops/code-scanning/alerts --paginate \
+  -q '.[] | "\(.rule.security_severity_level) \(.state) \(.most_recent_instance.category)"' | sort | uniq -c
 trivy image --severity HIGH,CRITICAL --ignore-unfixed deskflow-backend:local
 trivy image --severity HIGH,CRITICAL deskflow-frontend:local
 ```
+
+Expected: both gates pass; code scanning shows 44 *high* / *open* alerts, all `trivy-backend`.
 
 **Say:** "Two steps per image. The report step uploads every HIGH/CRITICAL finding to the
 Security tab. The gate fails the pipeline if any of those has a fix available. The first scan
@@ -122,6 +138,11 @@ covers containers, and Pod Security 'restricted' covers runtime."
 
 **Show:** https://github.com/v4xsh?tab=packages → `deskflow-backend` → versions.
 
+```bash
+gh api /users/v4xsh/packages/container/deskflow-backend/versions \
+  -q '.[] | [(.metadata.container.tags | join(",")), .created_at] | @tsv' | head -5
+```
+
 **Say:** "Every image is tagged with the full commit SHA plus `latest`. Deployments always use
 the SHA, so from any running pod I can trace back to the exact commit."
 
@@ -129,22 +150,51 @@ the SHA, so from any running pod I can trace back to the exact commit."
 kubectl get pods -n deskflow -o jsonpath='{range .items[*]}{.spec.containers[0].image}{"\n"}{end}' | sort -u
 ```
 
-## 7. Terraform (2 min)
+## 7. Terraform — Final Demo step 9 (3 min)
+
+**Say first:** "The AWS infrastructure is defined as code. To avoid cloud cost I demonstrate the
+Kubernetes part on a local kind cluster with the same Helm chart; the EKS deploy path is wired
+into CI behind the `KUBECONFIG_B64` secret."
 
 ```bash
 cd terraform
-cat main.tf | less          # walk through the vpc and eks modules
-terraform validate
-terraform plan              # only if AWS credentials are configured
-cd ..
+ls                          # versions.tf variables.tf main.tf outputs.tf terraform.tfvars.example
+terraform fmt -check && terraform validate
 ```
 
-**Say:** "Kubernetes runs workloads but can't create its own network or cluster. Terraform
-describes AWS: a VPC in ap-south-1 with two public and two private subnets, a NAT gateway so
-private nodes can pull images, and an EKS cluster with a managed node group. `outputs.tf`
-prints the exact `aws eks update-kubeconfig` command. `terraform destroy` tears it down."
+Walk through the files in this order:
 
-Show the AWS Console VPC/EKS screenshots if the cluster was created.
+1. **`versions.tf`** — Terraform ≥ 1.5 and the AWS provider ~> 5.70. Point at the S3 remote-state
+   block: "commented out so a fresh clone works; a team would enable it for shared, locked state."
+2. **`variables.tf`** — region `ap-south-1`, cluster name `deskflow-eks`, Kubernetes 1.34,
+   VPC CIDR `10.20.0.0/16`, node instance type `t3.medium`, node group min 2 / desired 2 / max 4,
+   `single_nat_gateway`. "Everything environment-specific is a variable;
+   `terraform.tfvars.example` shows how to override it without committing secrets."
+3. **`main.tf` → provider** — `default_tags` put Project / Environment / Owner on every resource.
+4. **`main.tf` → `module "vpc"`** (terraform-aws-modules/vpc):
+   - **VPC** `10.20.0.0/16` across 2 availability zones.
+   - **Public subnets** (two /24): internet-facing load balancers and the NAT gateway; tagged
+     `kubernetes.io/role/elb` so AWS load balancers find them.
+   - **Private subnets** (two /20): worker nodes and pods, not directly reachable from the
+     internet; tagged `kubernetes.io/role/internal-elb`.
+   - **NAT gateway**: lets private nodes reach out (pull images from GHCR, call AWS APIs) without
+     being exposed. One shared NAT by default to save cost; one per AZ for high availability.
+5. **`main.tf` → `module "eks"`** (terraform-aws-modules/eks):
+   - **EKS cluster** `deskflow-eks`: AWS runs the control plane; nodes live in the private subnets.
+   - Add-ons: CoreDNS, kube-proxy, VPC CNI (pods get VPC IPs), Pod Identity agent.
+   - **Managed node group**: `t3.medium`, AL2023, min 2 / max 4 — AWS handles node patching and
+     replacement.
+6. **`outputs.tf`** — VPC and subnet IDs, NAT IPs, cluster name/endpoint/version, and
+   `configure_kubectl`, which prints the exact
+   `aws eks update-kubeconfig --region ap-south-1 --name deskflow-eks` command.
+
+**Say:** "Kubernetes runs workloads but can't create its own network or cluster — Terraform does.
+`terraform plan` shows the diff, `apply` creates it, `destroy` removes everything, so the
+infrastructure is reviewable and repeatable instead of clicked together in the console."
+
+```bash
+cd ..
+```
 
 ## 8. Kubernetes (1.5 min)
 
@@ -279,5 +329,4 @@ onto Kubernetes, autoscaled and monitored."
 ```bash
 docker compose down -v
 ./scripts/local-cluster.sh down
-cd terraform && terraform destroy     # if AWS was used
 ```

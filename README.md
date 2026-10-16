@@ -273,6 +273,11 @@ The reason for the split: base images regularly contain CVEs for which the distr
 not released a fix yet. Failing on those would block every release without making anything
 safer — there is nothing to upgrade to. Anything that *can* be fixed still blocks the build.
 
+In the latest pipeline run both gates passed, both SARIF uploads succeeded, and the
+code-scanning API (`gh api repos/v4xsh/devops/code-scanning/alerts`) shows **44 open alerts,
+all severity high, all from `trivy-backend`** — exactly the unfixed Debian findings described
+below. The frontend has none. Evidence: `docs/screenshots/77-*` to `80-*`.
+
 **What the scan found.** The first scan of the backend flagged fixable CVEs in Starlette
 (e.g. CVE-2025-62727, a denial-of-service via `Range` header merging) and in the copies of
 `urllib3`/`setuptools` vendored inside pip. I fixed them by upgrading FastAPI/Starlette and
@@ -306,20 +311,23 @@ Built with the community modules `terraform-aws-modules/vpc/aws` (~> 5.13) and
 remote-state backend left commented out), `variables.tf`, `main.tf`, `outputs.tf`,
 `terraform.tfvars.example`.
 
+> **Scope.** The AWS VPC + EKS infrastructure in ap-south-1 is defined as code. To avoid cloud
+> cost, the Kubernetes deployment is demonstrated on a local kind cluster using the same Helm
+> chart. The EKS deploy path is wired in CI behind the `KUBECONFIG_B64` secret.
+
+What was verified: `terraform fmt -check`, `terraform init -backend=false` and
+`terraform validate` all pass (`docs/screenshots/26-terraform-validate.png`). No credentials are
+stored in the repo; authentication would come from the AWS CLI profile or environment.
+
+How the stack would be applied and removed:
+
 ```bash
 cd terraform
-cp terraform.tfvars.example terraform.tfvars   # optional — defaults work
-terraform init
-terraform plan
-terraform apply                                  # ~15 min; costs money (EKS + NAT)
+terraform init && terraform plan
+terraform apply                                  # VPC + EKS, billed hourly
 $(terraform output -raw configure_kubectl)       # aws eks update-kubeconfig --region ap-south-1 --name deskflow-eks
-...
-terraform destroy                                # always, after the demo
+terraform destroy
 ```
-
-`terraform fmt -check`, `terraform init -backend=false` and `terraform validate` pass
-(see `docs/screenshots/26-terraform-validate.png`). No credentials are stored in the repo;
-authentication comes from the AWS CLI profile or environment.
 
 ## 11. Kubernetes, Helm, Ingress and HPA
 
@@ -348,7 +356,7 @@ helm history deskflow -n deskflow
 helm rollback deskflow <revision> -n deskflow
 ```
 
-**Local cluster.** I used [kind](https://kind.sigs.k8s.io/) (3 nodes) as a stand-in for EKS.
+**Local cluster.** To avoid cloud cost, the deployment runs on [kind](https://kind.sigs.k8s.io/) (3 nodes) in place of EKS, with the same Helm chart.
 `scripts/local-cluster.sh` creates it and installs ingress-nginx, metrics-server,
 kube-prometheus-stack, the Grafana dashboard and the chart in one go:
 
@@ -419,7 +427,9 @@ Full list with captions: [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md). Presentatio
 | ![Dashboard](docs/screenshots/01-app-dashboard-desktop.png) Dashboard (desktop) | ![Mobile](docs/screenshots/05-app-dashboard-mobile.png) Dashboard (mobile) |
 | ![Create ticket](docs/screenshots/02-app-create-ticket-modal.png) Create-ticket modal | ![Swagger](docs/screenshots/06-swagger-docs.png) Swagger UI |
 | ![pytest](docs/screenshots/16-pytest.png) pytest — 30 passed | ![Trivy](docs/screenshots/17-trivy-backend.png) Trivy scan |
-| ![Actions](docs/screenshots/22-github-actions-run.png) GitHub Actions run | ![GHCR](docs/screenshots/24-ghcr-packages.png) Images in GHCR |
+| ![Actions](docs/screenshots/22-github-actions-run.png) GitHub Actions run | ![gh run list](docs/screenshots/75-gh-run-list.png) `gh run list` — all green |
+| ![Trivy in CI](docs/screenshots/77-gh-run-log-trivy-backend.png) Trivy report + gate in the pipeline log | ![Code scanning](docs/screenshots/80-code-scanning-summary.png) Code-scanning alerts by severity/state |
+| ![GHCR](docs/screenshots/24-ghcr-packages.png) Images in GHCR | ![GHCR versions](docs/screenshots/82-ghcr-backend-versions.png) One image version per commit SHA |
 | ![Pods](docs/screenshots/31-kubectl-get-pods.png) `kubectl get pods` | ![Ingress](docs/screenshots/38-app-via-ingress.png) App via Ingress |
 | ![HPA](docs/screenshots/40-kubectl-get-hpa-watch.png) HPA scaling 2 → 6 | ![Prometheus](docs/screenshots/43-prometheus-targets.png) Prometheus targets UP |
 | ![Grafana](docs/screenshots/45-grafana-dashboard.png) Grafana dashboard | ![Troubleshooting](docs/screenshots/52-lab1-describe-pod.png) ImagePullBackOff investigation |
@@ -429,7 +439,7 @@ Full list with captions: [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md). Presentatio
 ```bash
 docker compose down -v                  # stop Compose and delete the database volume
 ./scripts/local-cluster.sh down         # or: kind delete cluster --name deskflow
-cd terraform && terraform destroy       # if the AWS stack was created
+cd terraform && terraform destroy       # only if the AWS stack was ever applied
 ```
 
 ## 16. Further notes
