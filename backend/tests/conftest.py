@@ -42,7 +42,7 @@ def client(engine):
 
 @pytest.fixture()
 def agent(client):
-    resp = client.post("/api/agents", json={"name": "Test Agent", "email": "agent@example.com", "team": "Tier 1"})
+    resp = client.post("/api/agents", json={"name": "Test Agent", "email": "agent@deskflow.example.org", "team": "Tier 1"})
     assert resp.status_code == 201
     return resp.json()
 

@@ -15,10 +15,10 @@ branch_labels = None
 depends_on = None
 
 AGENTS = [
-    (1, "Aarav Sharma", "aarav@deskflow.dev", "Tier 1"),
-    (2, "Priya Nair", "priya@deskflow.dev", "Tier 2"),
-    (3, "Rohan Mehta", "rohan@deskflow.dev", "Billing"),
-    (4, "Isha Verma", "isha@deskflow.dev", "Platform"),
+    (1, "Aarav Sharma", "aarav@deskflow.example.org", "Tier 1"),
+    (2, "Priya Nair", "priya@deskflow.example.org", "Tier 2"),
+    (3, "Rohan Mehta", "rohan@deskflow.example.org", "Billing"),
+    (4, "Isha Verma", "isha@deskflow.example.org", "Platform"),
 ]
 
 # (title, description, status, priority, customer, assignee_id, hours_ago)
