@@ -7,7 +7,7 @@ provider "aws" {
         Project     = var.project
         Environment = var.environment
         ManagedBy   = "terraform"
-        Owner       = "Vansh Dobhal (10099)"
+        Owner       = "Vansh Dobhal - Roll No. 10099" # AWS tag values do not allow an em dash
       },
       var.tags,
     )

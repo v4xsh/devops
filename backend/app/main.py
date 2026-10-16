@@ -6,7 +6,7 @@ from app.config import settings
 from app.routers import agents, health, tickets
 
 app = FastAPI(
-    title="DeskFlow API — Vansh Dobhal (Roll No. 10099)",
+    title="DeskFlow API · Vansh Dobhal — Roll No. 10099",
     description=(
         "Helpdesk / support ticket management API for the Session 21 DevOps capstone.\n\n"
         "Author: **Vansh Dobhal — Roll No. 10099**"

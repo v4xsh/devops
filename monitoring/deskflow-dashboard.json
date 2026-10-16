@@ -5,7 +5,7 @@
     "deskflow",
     "fastapi"
   ],
-  "description": "DeskFlow helpdesk (Vansh Dobhal, Roll No. 10099): traffic, latency, errors, CPU and autoscaling",
+  "description": "DeskFlow helpdesk · Vansh Dobhal — Roll No. 10099 · traffic, latency, errors, CPU and autoscaling",
   "timezone": "browser",
   "refresh": "10s",
   "schemaVersion": 39,
