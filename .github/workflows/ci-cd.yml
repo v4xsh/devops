@@ -1,0 +1,228 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  BACKEND_IMAGE: ghcr.io/v4xsh/deskflow-backend
+  FRONTEND_IMAGE: ghcr.io/v4xsh/deskflow-frontend
+  TRIVY_VERSION: 0.76.0
+  TRIVY_SHA256: e24b1c51293c1b15e4ba8d45bbc7891ba053f90278ec2698f3562c993e145fe7
+  # Pull the vulnerability DB from mirrors to avoid GHCR rate limits on shared runners.
+  TRIVY_DB_REPOSITORY: mirror.gcr.io/aquasec/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+  TRIVY_JAVA_DB_REPOSITORY: mirror.gcr.io/aquasec/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Quality gate: nothing gets built or pushed unless this passes.
+  # ---------------------------------------------------------------------------
+  test:
+    name: Test (pytest + frontend build)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
+
+      - name: Install backend requirements
+        working-directory: backend
+        run: pip install -r requirements-dev.txt bandit==1.8.6
+
+      - name: Run pytest
+        working-directory: backend
+        run: pytest -q
+
+      - name: SAST (bandit)
+        working-directory: backend
+        run: bandit -r app -ll
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm ci && npm run build
+
+  # ---------------------------------------------------------------------------
+  # 2. Build both images, scan them with Trivy, push to GHCR tagged with the SHA.
+  # ---------------------------------------------------------------------------
+  build-scan-push:
+    name: Build, scan & push images
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
+    outputs:
+      image_tag: ${{ github.sha }}
+      deploy_enabled: ${{ steps.deploy-check.outputs.enabled }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Trivy ${{ env.TRIVY_VERSION }}
+        run: |
+          curl -sSfL -o trivy.tgz \
+            "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz"
+          echo "${TRIVY_SHA256}  trivy.tgz" | sha256sum -c -
+          tar xzf trivy.tgz trivy && sudo mv trivy /usr/local/bin/ && rm trivy.tgz
+          trivy --version
+
+      - name: Cache Trivy DB
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/trivy
+          key: trivy-db-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: trivy-db-${{ runner.os }}-
+
+      - name: Dependency, secret & IaC scan of the repository (report only)
+        run: trivy fs --scanners vuln,secret,misconfig --severity HIGH,CRITICAL --exit-code 0 .
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          load: true
+          tags: |
+            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+            ${{ env.BACKEND_IMAGE }}:latest
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.title=deskflow-backend
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
+
+      - name: Build frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          load: true
+          build-args: APP_VERSION=${{ github.sha }}
+          tags: |
+            ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+            ${{ env.FRONTEND_IMAGE }}:latest
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.title=deskflow-frontend
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
+
+      # Report step: every HIGH/CRITICAL finding (including ones with no upstream fix yet)
+      # goes to the Security tab. exit-code 0 so unfixable base-image CVEs never block a release.
+      - name: Trivy report (backend, SARIF)
+        run: trivy image --severity HIGH,CRITICAL --exit-code 0 --format sarif -o trivy-backend.sarif "$BACKEND_IMAGE:${{ github.sha }}"
+
+      - name: Trivy report (frontend, SARIF)
+        run: trivy image --severity HIGH,CRITICAL --exit-code 0 --format sarif -o trivy-frontend.sarif "$FRONTEND_IMAGE:${{ github.sha }}"
+
+      - name: Upload backend SARIF to Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        continue-on-error: true
+        with:
+          sarif_file: trivy-backend.sarif
+          category: trivy-backend
+
+      - name: Upload frontend SARIF to Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        continue-on-error: true
+        with:
+          sarif_file: trivy-frontend.sarif
+          category: trivy-frontend
+
+      # Gate step: fail the pipeline on HIGH/CRITICAL CVEs that already have a fix available,
+      # because those are ones we can and should patch before shipping.
+      - name: Trivy gate (backend, fixable HIGH/CRITICAL)
+        run: trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 "$BACKEND_IMAGE:${{ github.sha }}"
+
+      - name: Trivy gate (frontend, fixable HIGH/CRITICAL)
+        run: trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 "$FRONTEND_IMAGE:${{ github.sha }}"
+
+      - name: Push images to GHCR
+        run: |
+          docker push --all-tags "$BACKEND_IMAGE"
+          docker push --all-tags "$FRONTEND_IMAGE"
+          {
+            echo "### Published images"
+            echo "- \`$BACKEND_IMAGE:${{ github.sha }}\`"
+            echo "- \`$FRONTEND_IMAGE:${{ github.sha }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Check whether a deploy target is configured
+        id: deploy-check
+        env:
+          KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
+        run: |
+          if [ -n "$KUBECONFIG_B64" ]; then echo "enabled=true" >> "$GITHUB_OUTPUT"; else echo "enabled=false" >> "$GITHUB_OUTPUT"; echo "KUBECONFIG_B64 not set - deploy will be skipped"; fi
+
+  # ---------------------------------------------------------------------------
+  # 3. Deploy the exact images built above (same SHA) with Helm.
+  #    Skipped cleanly when no cluster credentials are configured.
+  # ---------------------------------------------------------------------------
+  deploy:
+    name: Deploy with Helm
+    needs: build-scan-push
+    if: needs.build-scan-push.outputs.deploy_enabled == 'true'
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/setup-helm@v4
+        with:
+          version: v3.16.2
+
+      - uses: azure/setup-kubectl@v4
+        with:
+          version: v1.31.2
+
+      - name: Configure kubeconfig
+        env:
+          KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
+        run: |
+          mkdir -p ~/.kube
+          echo "$KUBECONFIG_B64" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+          kubectl cluster-info
+
+      - name: Helm upgrade --install
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          helm upgrade --install deskflow ./helm/deskflow \
+            --namespace deskflow \
+            --set image.tag=${{ github.sha }} \
+            --wait --timeout 5m
+          kubectl get pods,svc,ingress,hpa -n deskflow
