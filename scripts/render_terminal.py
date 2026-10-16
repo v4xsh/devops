@@ -1,7 +1,7 @@
 """Render captured command output (.txt) as terminal-style PNG images for the report.
 
 Usage: python scripts/render_terminal.py docs/screenshots/*.txt
-Each foo.txt becomes foo.png next to it. Lines starting with "$ " are drawn as prompts.
+Each capture .txt becomes a .png with the same name next to it. Lines starting with "$ " are drawn as prompts.
 """
 import re
 import sys
