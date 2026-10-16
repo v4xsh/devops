@@ -1,20 +1,31 @@
+# ---- build stage: install dependencies into an isolated virtualenv ----
+FROM python:3.12-slim AS build
+ENV PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
+RUN python -m venv /opt/venv
+COPY requirements.txt .
+RUN /opt/venv/bin/pip install -r requirements.txt \
+    && /opt/venv/bin/pip uninstall -y pip setuptools wheel
+
+# ---- runtime stage ----
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PATH=/opt/venv/bin:$PATH
 
-WORKDIR /app
-
-# Pull in OS security fixes released after the base image was built.
+# OS security fixes, then drop the installer tooling the app never needs at runtime
+# (pip/setuptools vendor their own libraries, which only add scanner noise and attack surface).
 RUN apt-get update \
     && apt-get upgrade -y --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /usr/local/lib/python3.12/site-packages/pip* \
+              /usr/local/lib/python3.12/site-packages/setuptools* \
+              /usr/local/lib/python3.12/site-packages/wheel* \
+              /usr/local/lib/python3.12/ensurepip \
+              /usr/local/bin/pip*
 
-COPY requirements.txt .
-RUN pip install --upgrade pip setuptools wheel && pip install -r requirements.txt
-
+WORKDIR /app
+COPY --from=build /opt/venv /opt/venv
 COPY alembic.ini .
 COPY alembic ./alembic
 COPY app ./app
