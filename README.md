@@ -339,7 +339,7 @@ The Helm chart in `helm/deskflow/` packages the whole application:
 | `frontend-deployment.yaml` | Nginx pods (2 replicas); probes on `/healthz` |
 | `backend-service.yaml`, `frontend-service.yaml` | stable ClusterIP Services in front of the pods |
 | `postgres-statefulset.yaml` | PostgreSQL StatefulSet with a PersistentVolumeClaim + headless Service |
-| `postgres-secret.yaml` | DB password (or use `postgres.existingSecret`) |
+| `postgres-secret.yaml` | DB password — generated on first install and kept across upgrades (or use `postgres.existingSecret`) |
 | `configmap.yaml` | non-secret config: environment, CORS, DB host/user, backend URL |
 | `ingress.yaml` | `deskflow.local`: `/` → frontend, `/api` and `/docs` → backend |
 | `hpa.yaml` | backend autoscaling 2–6 replicas at 60 % average CPU |

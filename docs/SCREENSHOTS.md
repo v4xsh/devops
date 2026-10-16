@@ -6,6 +6,11 @@ Everything lives in [`screenshots/`](screenshots/). Every terminal capture exist
 the full raw output as `.txt` and a rendered terminal image as `.png` with the same name.
 Browser screenshots were taken with headless Chromium (Playwright).
 
+File numbers are grouped by stage rather than strictly consecutive: `01–19` app, API, database,
+images and tests · `22–26` GitHub pages, registry and Terraform · `30–45` Kubernetes, Ingress,
+HPA and monitoring · `50–66` troubleshooting labs · `70–74` Helm upgrade and rollback ·
+`75–83` GitHub CLI evidence (runs, pipeline Trivy logs, code scanning, GHCR).
+
 Captured on 16 Oct 2026 against Docker Compose (local), a 3-node kind cluster and GitHub
 (Actions, code scanning, GHCR). The AWS VPC + EKS infrastructure in ap-south-1 is defined as
 code; to avoid cloud cost, the Kubernetes deployment is demonstrated on the local kind cluster

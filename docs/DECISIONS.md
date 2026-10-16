@@ -12,6 +12,7 @@ A record of the choices made while building DeskFlow and why. Newest-relevant fi
 | Extra `ticket_events` table + `GET /api/activity` | Gives the dashboard a real activity feed instead of a fake one, and an audit trail of status changes. |
 | `/ready` returns HTTP 503 (not 200 with an error body) when `SELECT 1` fails | Kubernetes readiness probes and load balancers only look at the status code. |
 | OpenAPI schema served at `/api/openapi.json` (Swagger stays at `/docs`) | ingress-nginx's path validation rejects `.` in Ingress paths, so `/openapi.json` cannot have its own rule. Under `/api` it is covered by the existing backend route. |
+| Sample agent e-mails use `deskflow.example.org` | `example.org` is reserved for documentation, so sample addresses can never belong to a real person. (`.test` would be the other reserved choice, but the e-mail validator rejects special-use TLDs.) |
 | Seed data in its own Alembic migration (`0002`) | The demo starts with realistic data, and `alembic downgrade 0001` removes it cleanly. |
 | PostgreSQL advisory lock around migrations (`alembic/env.py`) | Each backend pod runs `alembic upgrade head` on start. With 2+ replicas starting together they would race to create the same tables. Tested with three concurrent migrators against one database: exactly one seed, no errors. |
 | Frontend calls only relative `/api/...` URLs | Nginx (Compose) or the Ingress (Kubernetes) does the routing, so one frontend build works everywhere. |
@@ -65,6 +66,7 @@ A record of the choices made while building DeskFlow and why. Newest-relevant fi
 | Low CPU request (50m in dev) | Utilisation is a percentage of the request, so a small request makes the HPA demo reachable on a laptop. |
 | Namespace enforces Pod Security Standard **restricted**; all pods run non-root with capabilities dropped | Runtime security layer. Required adding pod/container security contexts everywhere (including the troubleshooting manifests). |
 | Backend `readOnlyRootFilesystem: true` with an `emptyDir` on `/tmp` | The app writes nothing to disk. Nginx needs to write its rendered config, so the frontend is not read-only. |
+| Helm generates the Postgres password when `postgres.password` is empty | No default password ships in the chart. On first install a random 24-character password is created; on upgrades `lookup` reuses the existing Secret so the database password never rotates underneath Postgres. `values-dev.yaml` pins a simple dev password for local work, and `postgres.existingSecret` lets a real environment manage it outside Helm. Verified on kind: install → upgrade kept the same password. |
 | `maxUnavailable: 0` on the backend rollout | A bad release (e.g. wrong image tag) never takes healthy pods away — demonstrated in the Helm rollback rehearsal. |
 | Prometheus `serviceMonitorSelectorNilUsesHelmValues: false` **and** the ServiceMonitor carries `release: kube-prometheus-stack` | Either alone is enough; both make discovery robust if one is changed. |
 | Control-plane scrape jobs (etcd, scheduler, controller-manager, kube-proxy) disabled | Not reachable on kind or EKS; they would only show as DOWN on the targets page. |
