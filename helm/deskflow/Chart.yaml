@@ -1,0 +1,14 @@
+apiVersion: v2
+name: deskflow
+description: DeskFlow helpdesk - React frontend, FastAPI backend and PostgreSQL on Kubernetes
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords: [helpdesk, fastapi, react, postgresql]
+home: https://github.com/v4xsh/devops
+sources:
+  - https://github.com/v4xsh/devops
+maintainers:
+  - name: Vansh Dobhal — Roll No. 10099
+    email: vanshdobhal11@gmail.com
+    url: https://github.com/v4xsh

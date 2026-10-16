@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "deskflow.fullname" . }}-config
+  labels:
+    {{- include "deskflow.labels" . | nindent 4 }}
+data:
+  ENVIRONMENT: {{ .Values.config.environment | quote }}
+  CORS_ORIGINS: {{ .Values.config.corsOrigins | quote }}
+  POSTGRES_HOST: {{ include "deskflow.postgresHost" . | quote }}
+  POSTGRES_DB: {{ .Values.postgres.database | quote }}
+  POSTGRES_USER: {{ .Values.postgres.username | quote }}
+  BACKEND_URL: {{ printf "http://%s:%v" (include "deskflow.backendHost" .) .Values.backend.port | quote }}

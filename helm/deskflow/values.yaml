@@ -1,0 +1,99 @@
+# Default values: production-like settings for EKS.
+# Override per environment with -f values-dev.yaml or --set.
+
+image:
+  registry: ghcr.io/v4xsh
+  # CI sets this to the Git commit SHA: --set image.tag=<sha>
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+backend:
+  repository: deskflow-backend
+  replicaCount: 2
+  port: 8000
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 384Mi
+  livenessProbe:
+    path: /health
+    initialDelaySeconds: 15
+    periodSeconds: 15
+  readinessProbe:
+    path: /ready
+    initialDelaySeconds: 5
+    periodSeconds: 10
+
+frontend:
+  repository: deskflow-frontend
+  replicaCount: 2
+  port: 8080
+  resources:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+config:
+  environment: production
+  corsOrigins: "https://deskflow.local"
+
+postgres:
+  enabled: true
+  image: postgres:16-alpine
+  database: deskflow
+  username: deskflow
+  # Used only when existingSecret is empty. Override in real environments.
+  password: change-me-in-prod
+  # Name of a pre-created Secret with key "password" (recommended outside the classroom).
+  existingSecret: ""
+  storage: 2Gi
+  storageClass: ""
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+ingress:
+  enabled: true
+  className: nginx
+  host: deskflow.local
+  annotations: {}
+  # Extra backend paths exposed through the Ingress besides /api.
+  extraBackendPaths:
+    - /docs
+    - /openapi.json
+  tls: []
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 60
+
+serviceMonitor:
+  enabled: false
+  interval: 15s
+  # Must match the Prometheus Operator's serviceMonitorSelector.
+  labels:
+    release: kube-prometheus-stack
+
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]

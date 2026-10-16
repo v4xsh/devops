@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: deskflow
+  labels:
+    app.kubernetes.io/part-of: deskflow
+    owner: vansh-dobhal-10099
+    # Enforce the "restricted" Pod Security Standard for everything in the namespace.
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted

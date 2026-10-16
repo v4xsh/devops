@@ -1,0 +1,27 @@
+DeskFlow {{ .Chart.AppVersion }} deployed as release "{{ .Release.Name }}" in namespace "{{ .Release.Namespace }}".
+Images: {{ include "deskflow.image" (dict "ctx" . "repository" .Values.backend.repository) }}
+        {{ include "deskflow.image" (dict "ctx" . "repository" .Values.frontend.repository) }}
+
+Check the rollout:
+  kubectl get pods,svc -n {{ .Release.Namespace }}
+{{- if .Values.autoscaling.enabled }}
+  kubectl get hpa -n {{ .Release.Namespace }}
+{{- end }}
+
+{{- if .Values.ingress.enabled }}
+
+Open the app through the Ingress:
+  http://{{ .Values.ingress.host }}/        (frontend)
+  http://{{ .Values.ingress.host }}/api/tickets  (backend)
+  http://{{ .Values.ingress.host }}/docs     (Swagger)
+Add "<ingress-ip> {{ .Values.ingress.host }}" to /etc/hosts, or test with:
+  curl -H "Host: {{ .Values.ingress.host }}" http://<ingress-ip>/api/tickets/stats
+{{- else }}
+
+Port-forward the frontend:
+  kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "deskflow.fullname" . }}-frontend 3000:80
+{{- end }}
+
+Roll back if something goes wrong:
+  helm history {{ .Release.Name }} -n {{ .Release.Namespace }}
+  helm rollback {{ .Release.Name }} <revision> -n {{ .Release.Namespace }}
