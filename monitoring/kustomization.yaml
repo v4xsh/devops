@@ -1,0 +1,13 @@
+# Provisions the DeskFlow Grafana dashboard as a ConfigMap that the
+# Grafana sidecar picks up automatically:  kubectl apply -k monitoring/
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: monitoring
+generatorOptions:
+  disableNameSuffixHash: true
+  labels:
+    grafana_dashboard: "1"
+configMapGenerator:
+  - name: deskflow-dashboard
+    files:
+      - deskflow-dashboard.json

@@ -1,0 +1,74 @@
+# Values for prometheus-community/kube-prometheus-stack.
+#   helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+#     -n monitoring --create-namespace -f monitoring/kube-prometheus-stack-values.yaml
+
+# Small footprint for a classroom / kind cluster.
+alertmanager:
+  enabled: false
+
+# Control-plane components are not reachable on kind/EKS; disabling them
+# keeps the Prometheus targets page free of permanently DOWN targets.
+kubeEtcd:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+
+prometheus:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - prometheus.deskflow.local
+    paths:
+      - /
+  prometheusSpec:
+    # Pick up ServiceMonitors from every namespace, not only ones labelled for this release.
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    scrapeInterval: 15s
+    evaluationInterval: 15s
+    retention: 2d
+    resources:
+      requests:
+        cpu: 100m
+        memory: 400Mi
+      limits:
+        memory: 1Gi
+
+grafana:
+  adminUser: admin
+  adminPassword: deskflow-admin
+  defaultDashboardsTimezone: browser
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - grafana.deskflow.local
+    path: /
+  sidecar:
+    dashboards:
+      enabled: true
+      # Any ConfigMap with this label (in any namespace) is loaded as a dashboard.
+      label: grafana_dashboard
+      labelValue: "1"
+      searchNamespace: ALL
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+kube-state-metrics:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 64Mi
+
+prometheus-node-exporter:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi

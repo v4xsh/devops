@@ -1,0 +1,5 @@
+# kind kubelets use self-signed certs, so metrics-server must skip verification there.
+# On EKS drop this flag.
+args:
+  - --kubelet-insecure-tls
+  - --kubelet-preferred-address-types=InternalIP
