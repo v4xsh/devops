@@ -50,8 +50,9 @@ postgres:
   image: postgres:16-alpine
   database: deskflow
   username: deskflow
-  # Used only when existingSecret is empty. Override in real environments.
-  password: change-me-in-prod
+  # Leave empty to have the chart generate a random password on first install
+  # (kept across upgrades), or set existingSecret to manage it outside Helm.
+  password: ""
   # Name of a pre-created Secret with key "password" (recommended outside the classroom).
   existingSecret: ""
   storage: 2Gi
