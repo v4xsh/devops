@@ -6,8 +6,10 @@ Everything lives in [`screenshots/`](screenshots/). Every terminal capture exist
 the full raw output as `.txt` and a rendered terminal image as `.png` with the same name.
 Browser screenshots were taken with headless Chromium (Playwright).
 
-Captured on 16 Oct 2026 against: Docker Compose (local), a 3-node kind cluster
-(stand-in for EKS), GitHub Actions run [#5](https://github.com/v4xsh/devops/actions/runs/38867226880) and GHCR.
+Captured on 16 Oct 2026 against Docker Compose (local), a 3-node kind cluster and GitHub
+(Actions, code scanning, GHCR). The AWS VPC + EKS infrastructure in ap-south-1 is defined as
+code; to avoid cloud cost, the Kubernetes deployment is demonstrated on the local kind cluster
+using the same Helm chart, and the EKS deploy path is wired in CI behind the `KUBECONFIG_B64` secret.
 
 ## Mapped to the 15 Final Demo steps
 
@@ -53,9 +55,9 @@ Captured on 16 Oct 2026 against: Docker Compose (local), a 3-node kind cluster
 | File | Caption |
 |---|---|
 | `16-pytest.png` / `.txt` | `pytest -v` on Python 3.12: 30 passed |
-| `20-gh-run-list.png` / `.txt` | Recent workflow runs, all successful |
-| `21-gh-run-view.png` / `.txt` | Run #5 in detail: test → build-scan-push green, deploy skipped cleanly (no cluster secret), no annotations |
-| `22-github-actions-run.png` | Run #5 summary page with the three-job graph |
+| `75-gh-run-list.png` / `.txt` | `gh run list -R v4xsh/devops -L 10`: every pipeline run on `main` successful |
+| `76-gh-run-view.png` / `.txt` | `gh run view` of the latest green run: test and build-scan-push ✓, deploy skipped (no cluster secret) |
+| `22-github-actions-run.png` | Run summary page with the three-job graph |
 | `23-github-actions-build-job.png` | Build, scan & push job: every step green, including both Trivy gates and the GHCR push |
 
 ### 6. Docker
@@ -70,7 +72,10 @@ Captured on 16 Oct 2026 against: Docker Compose (local), a 3-node kind cluster
 |---|---|
 | `17-trivy-backend.png` / `.txt` | Backend: gate passes (0 fixable HIGH/CRITICAL); report lists unfixed Debian findings such as CVE-2026-76642 |
 | `18-trivy-frontend.png` / `.txt` | Frontend (Alpine + Nginx): 0 HIGH/CRITICAL |
-| `23-github-actions-build-job.png` | Trivy report, SARIF upload and gate steps in the pipeline |
+| `77-gh-run-log-trivy-backend.png` / `.txt` | `gh run view --log`, backend: Trivy report → SARIF upload → gate (0 fixable HIGH/CRITICAL) |
+| `78-gh-run-log-trivy-frontend.png` / `.txt` | `gh run view --log`, frontend: same three steps, image clean |
+| `79-code-scanning-alerts.png` / `.txt` | `gh api .../code-scanning/alerts`: the Trivy findings in the Security tab |
+| `80-code-scanning-summary.png` / `.txt` | Alerts by severity and state: 44 high / open, all from `trivy-backend`; none for the frontend |
 
 ### 8. Registry
 
@@ -78,12 +83,15 @@ Captured on 16 Oct 2026 against: Docker Compose (local), a 3-node kind cluster
 |---|---|
 | `24-ghcr-packages.png` | `deskflow-backend` and `deskflow-frontend` packages on GHCR, linked to v4xsh/devops |
 | `25-ghcr-backend-package.png` | Backend package versions: one tag per commit SHA plus `latest`, public |
+| `81-ghcr-packages.png` / `.txt` | `gh api /users/v4xsh/packages?package_type=container`: both DeskFlow images public and linked to v4xsh/devops |
+| `82-ghcr-backend-versions.png` / `.txt` | `deskflow-backend` versions, each tagged with its full commit SHA |
+| `83-ghcr-frontend-versions.png` / `.txt` | `deskflow-frontend` versions, each tagged with its full commit SHA |
 
 ### 9. Terraform
 
 | File | Caption |
 |---|---|
-| `26-terraform-validate.png` / `.txt` | `terraform fmt -check`, `terraform init -backend=false` (vpc + eks modules, AWS provider) and `terraform validate` → Success |
+| `26-terraform-validate.png` / `.txt` | `terraform fmt -check`, `terraform init -backend=false` (vpc + eks modules, AWS provider) and `terraform validate` → Success. The code itself (VPC, public/private subnets, NAT gateway, EKS, managed node group, outputs) is walked through live — see DEMO.md |
 
 ### 10. Kubernetes
 
@@ -149,17 +157,3 @@ Captured on 16 Oct 2026 against: Docker Compose (local), a 3-node kind cluster
 | `64-lab2-test-traffic.png` / `.txt` | Traffic to the Service: connection refused |
 | `65-lab2-fix.png` / `.txt` | Patch the selector |
 | `66-lab2-fixed.png` / `.txt` | Endpoints populated, `{"status":"ok"}` through the Service |
-
-## Still to capture manually
-
-These need my AWS account, a signed-in GitHub session or a live audience:
-
-- [ ] **`terraform plan` output** against a real AWS account (`terraform plan | tee docs/terraform-plan.txt`) — no AWS credentials on the build machine.
-- [ ] **AWS Console**: VPC with its subnets/NAT gateway, and the EKS cluster `deskflow-eks` with its node group, in ap-south-1 (only after `terraform apply`).
-- [ ] **`terraform destroy`** completion ("Destroy complete!").
-- [ ] **Trivy log inside the pipeline**: open the *Build, scan & push images* job while signed in to GitHub and screenshot the expanded "Trivy gate" / "Trivy report" steps (raw logs are hidden from signed-out visitors).
-- [ ] **Security → Code scanning** tab showing the uploaded Trivy findings (visible to repository admins).
-- [ ] **Live demo** of a commit flowing through the pipeline (see [DEMO.md](DEMO.md)).
-- [ ] Optional: the app running on a real EKS cluster through an AWS load balancer.
-
-Exact commands for the AWS steps are in [DECISIONS.md → What I still need to run myself](DECISIONS.md#what-i-still-need-to-run-myself).
