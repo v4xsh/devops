@@ -1,0 +1,53 @@
+name: deskflow
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: deskflow
+      POSTGRES_PASSWORD: deskflow
+      POSTGRES_DB: deskflow
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Not published on the host: reach it with `docker compose exec db psql -U deskflow`.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U deskflow -d deskflow"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ./backend
+    image: deskflow-backend:local
+    environment:
+      DATABASE_URL: postgresql+psycopg://deskflow:deskflow@db:5432/deskflow
+      ENVIRONMENT: compose
+      CORS_ORIGINS: http://localhost:3000
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/ready', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 15s
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        APP_VERSION: compose
+    image: deskflow-frontend:local
+    environment:
+      BACKEND_URL: http://backend:8000
+    ports:
+      - "3000:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  pgdata:
